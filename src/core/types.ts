@@ -76,6 +76,44 @@ export interface AdjustFlowRateInput extends FlowActorInput {
   ratePerSecond: bigint;
 }
 
+export const STREAM_KINDS = {
+  FLOW: "flow",
+  LOCKUP: "lockup",
+} as const;
+
+export type StreamKind = (typeof STREAM_KINDS)[keyof typeof STREAM_KINDS];
+
+export interface RouterWithdrawInput {
+  tokenId: string | bigint;
+  caller: string;
+  to: string;
+  amount: bigint;
+}
+
+export interface StreamNftRecord {
+  tokenId: string;
+  streamId: string;
+  streamKind: StreamKind;
+}
+
+export interface TransferStreamNftInput {
+  tokenId: string | bigint;
+  from: string;
+  to: string;
+}
+
+export interface PaymasterForwardInput {
+  user: string;
+  feeToken: string;
+  feeAmount: bigint;
+  maxFeeAmount: bigint;
+  expirationLedger: number;
+  feeRecipient: string;
+  targetContract: string;
+  functionName: string;
+  args: readonly unknown[];
+}
+
 export interface FundableFlowClient<TTransaction> {
   create(input: CreateFlowInput): Promise<TTransaction>;
   createAndDeposit(input: CreateAndDepositFlowInput): Promise<TTransaction>;

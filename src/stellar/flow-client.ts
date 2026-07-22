@@ -1,9 +1,7 @@
 import type { AssembledTransaction } from "@stellar/stellar-sdk/contract";
 import {
   CHAIN_FAMILIES,
-  FUNDABLE_ERROR_CODES,
   FLOW_STATUSES,
-  FundableError,
   toFundableError,
   toUnixSeconds,
   type AdjustFlowRateInput,
@@ -22,7 +20,12 @@ import {
   type FlowStream as GeneratedFlowStream,
 } from "../generated/flow/src/index.js";
 import type { StellarFundableClientConfig, StellarMethodOptions } from "./types.js";
-import { assertPositive, assertStellarAddress, toStreamId } from "./validation.js";
+import {
+  assertPositive,
+  assertStellarAddress,
+  assertTokenDecimals,
+  toStreamId,
+} from "./validation.js";
 
 export type StellarTransaction<TResult> = AssembledTransaction<TResult>;
 
@@ -291,13 +294,7 @@ export class StellarFlowClient {
     assertStellarAddress(input.recipient, "Recipient");
     assertStellarAddress(input.token.address, "Token");
     assertPositive(input.ratePerSecond, "Rate per second");
-    if (!Number.isInteger(input.token.decimals) || input.token.decimals < 0 || input.token.decimals > 18) {
-      throw new FundableError({
-        code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
-        message: "Flow token decimals must be an integer between 0 and 18.",
-        chain: "stellar",
-      });
-    }
+    assertTokenDecimals(input.token.decimals, "Flow token decimals");
   }
 
   private async readAmount(
