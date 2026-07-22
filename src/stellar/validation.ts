@@ -65,6 +65,16 @@ export function assertPositive(value: bigint, label: string): void {
   }
 }
 
+export function assertNonNegative(value: bigint, label: string): void {
+  if (value < 0n) {
+    throw new FundableError({
+      code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
+      message: `${label} cannot be negative.`,
+      chain: "stellar",
+    });
+  }
+}
+
 export function assertTokenDecimals(value: number, label = "Token decimals"): void {
   if (!Number.isInteger(value) || value < 0 || value > 18) {
     throw new FundableError({

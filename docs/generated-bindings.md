@@ -67,3 +67,6 @@ pnpm generate:paymaster -- /absolute/path/to/paymaster.wasm
 
 The shared generator removes the generated `window.Buffer` mutation. All four
 bindings are compiled into the SDK behind chain-neutral high-level clients.
+
+`0.1.0-alpha.3` adds the high-level Lockup Router mapping without changing the
+generated bindings or contract artifacts, so it retains this exact provenance.

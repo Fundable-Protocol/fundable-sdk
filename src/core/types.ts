@@ -49,6 +49,20 @@ export interface CreateAndDepositFlowInput extends CreateFlowInput {
   amount: bigint;
 }
 
+export interface CreateLockupInput {
+  sender: string;
+  recipient: string;
+  token: TokenReference;
+  totalAmount: bigint;
+  startTime: bigint | Date;
+  endTime: bigint | Date;
+  cliffTime?: bigint | Date;
+  startUnlockAmount?: bigint;
+  cliffUnlockAmount?: bigint;
+  granularitySeconds?: bigint;
+  cancelable?: boolean;
+}
+
 export interface FlowAmountInput {
   streamId: string | bigint;
   amount: bigint;

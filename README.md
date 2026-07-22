@@ -44,6 +44,20 @@ const stream = await fundable.flows.getStream("42");
 const withdrawable = await fundable.flows.getWithdrawableAmount("42");
 ```
 
+Create NFT-backed Flow and Lockup streams through the Router:
+
+```ts
+const lockup = await fundable.router?.createLockup({
+  sender: "G...",
+  recipient: "G...",
+  token: { address: "C...", decimals: 7 },
+  totalAmount: 1_000_000_000n,
+  startTime: new Date(),
+  endTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1_000),
+  cancelable: true,
+});
+```
+
 Read methods return decoded domain values. Flow write methods currently target
 the Flow engine contract directly and return the Stellar SDK's
 `AssembledTransaction`, preserving simulation, signing, serialization, and
