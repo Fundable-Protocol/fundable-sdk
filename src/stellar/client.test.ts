@@ -32,4 +32,23 @@ describe("createFundableClient", () => {
       }),
     ).toThrow(FundableError);
   });
+
+  it("enables optional Router, Stream NFT, and Paymaster capabilities", () => {
+    const client = createFundableClient({
+      chain: "stellar",
+      network: "testnet",
+      rpcUrl: "https://rpc.example.com",
+      networkPassphrase: "Test SDF Network ; September 2015",
+      contracts: {
+        flow: contractId(),
+        router: contractId(),
+        streamNft: contractId(),
+        paymaster: contractId(),
+      },
+    });
+
+    expect(client.router).toBeDefined();
+    expect(client.streamNft).toBeDefined();
+    expect(client.paymaster).toBeDefined();
+  });
 });

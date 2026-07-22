@@ -12,6 +12,7 @@ Detailed guides live in [`docs/`](./docs):
 - [Getting started](./docs/getting-started.md)
 - [Multichain architecture](./docs/multichain-architecture.md)
 - [Generated binding provenance](./docs/generated-bindings.md)
+- [Router, Stream NFT, and Paymaster development](./docs/router-paymaster.md)
 
 ## Install
 
@@ -61,10 +62,11 @@ const sent = await transaction.signAndSend();
 console.log(sent.result);
 ```
 
-Fundable's NFT-backed creation workflow goes through the Router contract. That
-orchestration and sponsored Paymaster execution remain application-owned in
-`0.1.0` and will move into dedicated SDK capabilities next; consumers should
-not use the engine-level `create` method when an NFT receipt is required.
+Fundable's NFT-backed creation workflow goes through the Router contract.
+Router, Stream NFT, and Paymaster capability groups are under development for
+the next prerelease; see the development guide for the current surface and
+release gates. Consumers of `0.1.0-alpha.1` should not use the engine-level
+`create` method when an NFT receipt is required.
 
 ## Multichain boundary
 
