@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const generated = vi.hoisted(() => ({
   createFlow: vi.fn(),
+  createLockup: vi.fn(),
   getStreamData: vi.fn(),
   forward: vi.fn(),
 }));
@@ -11,6 +12,7 @@ const generated = vi.hoisted(() => ({
 vi.mock("../generated/router/src/index.js", () => ({
   Client: class {
     create_flow_stream = generated.createFlow;
+    create_lockup_stream = generated.createLockup;
   },
 }));
 
@@ -77,6 +79,70 @@ describe("Stellar protocol clients", () => {
       },
       undefined,
     );
+  });
+
+  it("routes validated Lockup creation through the Router contract", async () => {
+    const sender = Keypair.random().publicKey();
+    const recipient = Keypair.random().publicKey();
+    const token = contractId(2);
+    generated.createLockup.mockResolvedValue({ result: 10n });
+    const client = new StellarRouterClient({
+      ...baseConfig,
+      contracts: { ...baseConfig.contracts, router: contractId(1) },
+    });
+
+    await client.createLockup({
+      sender,
+      recipient,
+      token: { address: token, decimals: 7 },
+      totalAmount: 100n,
+      startTime: 1_000n,
+      endTime: 2_000n,
+      cliffTime: 1_200n,
+      startUnlockAmount: 10n,
+      cliffUnlockAmount: 20n,
+      granularitySeconds: 60n,
+      cancelable: true,
+    });
+
+    expect(generated.createLockup).toHaveBeenCalledWith(
+      {
+        params: {
+          sender,
+          recipient,
+          token,
+          total_amount: 100n,
+          start_time: 1_000n,
+          end_time: 2_000n,
+          cliff_time: 1_200n,
+          start_unlock_amount: 10n,
+          cliff_unlock_amount: 20n,
+          granularity: 60n,
+          cancelable: true,
+        },
+      },
+      undefined,
+    );
+  });
+
+  it("rejects invalid Lockup schedules before contract simulation", async () => {
+    const sender = Keypair.random().publicKey();
+    const client = new StellarRouterClient({
+      ...baseConfig,
+      contracts: { ...baseConfig.contracts, router: contractId(1) },
+    });
+
+    await expect(
+      client.createLockup({
+        sender,
+        recipient: Keypair.random().publicKey(),
+        token: { address: contractId(2), decimals: 7 },
+        totalAmount: 100n,
+        startTime: 2_000n,
+        endTime: 1_000n,
+      }),
+    ).rejects.toThrow("End time must be later than start time");
+    expect(generated.createLockup).not.toHaveBeenCalled();
   });
 
   it("normalizes Stream NFT metadata", async () => {

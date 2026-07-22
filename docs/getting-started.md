@@ -44,5 +44,7 @@ const transaction = await fundable.flows.deposit({
 const result = await transaction.signAndSend();
 ```
 
-Router-based NFT creation and sponsored Paymaster execution are not yet part
-of the public SDK workflow. They remain release-roadmap items.
+Router-based NFT creation, Stream NFT reads, and sponsored Paymaster execution
+are available when their contract IDs are supplied in the client configuration.
+See [Router, Stream NFT, and Paymaster](./router-paymaster.md) for the complete
+surface.

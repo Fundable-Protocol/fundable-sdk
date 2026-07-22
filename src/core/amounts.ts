@@ -53,7 +53,10 @@ export function formatUnits(value: bigint, decimals: number): string {
   return `${negative ? "-" : ""}${whole}${fraction ? `.${fraction}` : ""}`;
 }
 
-export function toUnixSeconds(value?: bigint | Date): bigint {
+export function toUnixSeconds(
+  value?: bigint | Date,
+  label = "Start time",
+): bigint {
   if (value === undefined) {
     return 0n;
   }
@@ -61,7 +64,7 @@ export function toUnixSeconds(value?: bigint | Date): bigint {
     if (value < 0n) {
       throw new FundableError({
         code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
-        message: "Start time cannot be negative.",
+        message: `${label} cannot be negative.`,
       });
     }
     return value;
@@ -71,7 +74,7 @@ export function toUnixSeconds(value?: bigint | Date): bigint {
   if (!Number.isFinite(milliseconds) || milliseconds < 0) {
     throw new FundableError({
       code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
-      message: "Start time must be a valid date.",
+      message: `${label} must be a valid date.`,
     });
   }
   return BigInt(Math.floor(milliseconds / 1_000));

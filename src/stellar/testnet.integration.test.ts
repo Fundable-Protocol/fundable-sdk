@@ -64,4 +64,22 @@ describe.runIf(runIntegration)("Fundable tagged testnet deployment", () => {
 
     expect(transaction?.result).toEqual(expect.any(BigInt));
   });
+
+  it("simulates Router Lockup creation without submitting a transaction", async () => {
+    const startTime = BigInt(Math.floor(Date.now() / 1_000) + 30);
+    const transaction = await client.router?.createLockup({
+      sender: deployment.admin,
+      recipient: Keypair.random().publicKey(),
+      token: {
+        address: Asset.native().contractId(Networks.TESTNET),
+        decimals: 7,
+      },
+      totalAmount: 1n,
+      startTime,
+      endTime: startTime + 3_600n,
+      granularitySeconds: 1n,
+    });
+
+    expect(transaction?.result).toEqual(expect.any(BigInt));
+  });
 });
