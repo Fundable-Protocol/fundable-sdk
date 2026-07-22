@@ -1,7 +1,6 @@
 # Router, Stream NFT, and Paymaster development
 
-These capabilities are implemented on the `feat/router-nft-paymaster`
-development branch and are not part of `0.1.0-alpha.1`.
+These capabilities are available from `0.1.0-alpha.2`.
 
 Configure their contract IDs to enable the optional capability groups:
 
@@ -30,9 +29,16 @@ The initial surface includes:
 All write methods return Stellar `AssembledTransaction` objects. Applications
 retain control over simulation, Soroban authorization, signing, and submission.
 
-## Release gates
+## Testnet integration
 
-Before publishing these capabilities, regenerate all three bindings from clean,
-tagged contract artifacts and record their commit, WASM hash, Stellar CLI
-version, and exact generation commands. Add integration coverage against a
-deployed testnet set before promoting the next prerelease.
+The integration suite reads Stream NFT and Paymaster state and simulates Router
+flow creation against the recorded testnet deployment without submitting a
+transaction:
+
+```bash
+pnpm test:testnet
+```
+
+Set the `FUNDABLE_TESTNET_*` environment variables to test a replacement
+deployment. The committed defaults correspond to the contract release recorded
+in the generated-binding provenance guide.
