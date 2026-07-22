@@ -36,8 +36,8 @@ const fundable = createFundableClient({
 });
 ```
 
-The top-level client exposes capability groups. Flow is available in the first
-release:
+The top-level client exposes Flow, Router, Stream NFT, and Paymaster capability
+groups when their contract IDs are configured:
 
 ```ts
 const stream = await fundable.flows.getStream("42");
@@ -62,11 +62,9 @@ const sent = await transaction.signAndSend();
 console.log(sent.result);
 ```
 
-Fundable's NFT-backed creation workflow goes through the Router contract.
-Router, Stream NFT, and Paymaster capability groups are under development for
-the next prerelease; see the development guide for the current surface and
-release gates. Consumers of `0.1.0-alpha.1` should not use the engine-level
-`create` method when an NFT receipt is required.
+Fundable's NFT-backed creation workflow goes through `fundable.router`. The
+`fundable.streamNft` and `fundable.paymaster` groups expose NFT ownership and
+bounded fee-forwarding operations. See the capability guide for examples.
 
 ## Multichain boundary
 

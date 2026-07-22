@@ -1,6 +1,6 @@
 {
     "name": "@fundable/sdk",
-    "version": "0.1.0-alpha.1",
+    "version": "0.1.0-alpha.2",
     "private": false,
     "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
     "license": "MIT",
@@ -43,8 +43,12 @@
         "clean": "node scripts/clean.mjs",
         "build": "pnpm clean && tsc",
         "dev": "tsc --watch",
-        "generate:flow": "node scripts/generate-flow-binding.mjs",
+        "generate:flow": "node scripts/generate-stellar-binding.mjs flow",
+        "generate:router": "node scripts/generate-stellar-binding.mjs router",
+        "generate:stream-nft": "node scripts/generate-stellar-binding.mjs stream_nft",
+        "generate:paymaster": "node scripts/generate-stellar-binding.mjs paymaster",
         "test": "vitest run",
+        "test:testnet": "FUNDABLE_TESTNET_INTEGRATION=1 vitest run src/stellar/testnet.integration.test.ts",
         "typecheck": "tsc --noEmit",
         "prepack": "pnpm test && pnpm build"
     },

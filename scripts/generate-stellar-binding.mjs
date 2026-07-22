@@ -3,15 +3,21 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
-const wasmArgument = process.argv.slice(2).find((argument) => argument !== "--");
+const [contractName, wasmArgument] = process.argv
+  .slice(2)
+  .filter((argument) => argument !== "--");
 
-if (!wasmArgument) {
-  throw new Error("Usage: pnpm generate:flow -- /absolute/path/to/flow.wasm");
+if (!contractName || !wasmArgument) {
+  throw new Error(
+    "Usage: node scripts/generate-stellar-binding.mjs <contract-name> /absolute/path/to/contract.wasm",
+  );
 }
 
 const wasmPath = resolve(wasmArgument);
-const temporaryDirectory = await mkdtemp(join(tmpdir(), "fundable-flow-binding-"));
-const generatedDirectory = join(temporaryDirectory, "flow");
+const temporaryDirectory = await mkdtemp(
+  join(tmpdir(), `fundable-${contractName}-binding-`),
+);
+const generatedDirectory = join(temporaryDirectory, contractName);
 
 const generation = spawnSync(
   "stellar",
@@ -33,24 +39,17 @@ if (generation.error) {
 
 if (generation.status !== 0) {
   process.exitCode = generation.status ?? 1;
-  throw new Error("Stellar CLI failed to generate the Flow binding");
+  throw new Error(`Stellar CLI failed to generate the ${contractName} binding`);
 }
 
 const generatedPath = join(generatedDirectory, "src", "index.ts");
-const destinationPath = resolve("src/generated/flow/src/index.ts");
-const browserGlobalMutation = `if (typeof window !== "undefined") {
-  //@ts-ignore Buffer exists
-  window.Buffer = window.Buffer || Buffer;
-}
-
-
-
-
-
-`;
+const destinationPath = resolve(
+  `src/generated/${contractName}/src/index.ts`,
+);
+const browserGlobalMutation = /if \(typeof window !== "undefined"\) \{\n  \/\/@ts-ignore Buffer exists\n  window\.Buffer = window\.Buffer \|\| Buffer;\n\}\n+/;
 const generatedSource = await readFile(generatedPath, "utf8");
 
-if (!generatedSource.includes(browserGlobalMutation)) {
+if (!browserGlobalMutation.test(generatedSource)) {
   throw new Error(
     "Generated binding format changed: expected Buffer browser-global block was not found",
   );

@@ -39,6 +39,31 @@ Every future binding release must record:
 - Stellar CLI version;
 - exact binding-generation command.
 
-The Flow binding is compiled into the SDK. Other generated directories
-are retained as implementation inputs for upcoming adapters but are excluded
-from the published package until their high-level clients are ready.
+## Protocol contracts v0.1.0-alpha.2 provenance
+
+- Contract release: `contracts-v0.1.0-alpha.2`
+- Contract commit: `9289fd9e42a4fbdb7906ceb7a7391b5e59e7744b`
+- Stellar CLI: `stellar 27.0.0`
+- Contract verification: `make test` from an empty target directory (94 tests
+  passed)
+
+Optimized WASM SHA-256 values:
+
+| Contract | SHA-256 |
+| --- | --- |
+| Flow | `e565a700b1c60de22d792f8e6191320fc3d5073fdca989ce73aa849c8b98d49e` |
+| Router | `22ba92932a85d919e54b59c32479de2feffb2e38f791cd73d7fd281864bff71f` |
+| Stream NFT | `69d47d59a77eeeb70a83f6136f410bb3a065ed25058df7d250494d176fbe5d3f` |
+| Paymaster | `1aa4ac34cacb9ce917cb9bf0cc490f15378ceb98bc9e7ff1eb80354350c54b5e` |
+
+The bindings were regenerated with:
+
+```bash
+pnpm generate:flow -- /absolute/path/to/flow.wasm
+pnpm generate:router -- /absolute/path/to/router.wasm
+pnpm generate:stream-nft -- /absolute/path/to/stream_nft.wasm
+pnpm generate:paymaster -- /absolute/path/to/paymaster.wasm
+```
+
+The shared generator removes the generated `window.Buffer` mutation. All four
+bindings are compiled into the SDK behind chain-neutral high-level clients.
