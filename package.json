@@ -1,20 +1,63 @@
 {
     "name": "@fundable/sdk",
-    "version": "0.1.0",
-    "private": true,
-    "description": "TypeScript SDK for interacting with Fundable Stellar contracts",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "tsc",
-        "dev": "tsc --watch"
+    "version": "0.1.0-alpha.1",
+    "private": false,
+    "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Fundable-Protocol/fundable-sdk.git"
     },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "docs",
+        "README.md"
+    ],
+    "homepage": "https://github.com/Fundable-Protocol/fundable-sdk#readme",
+    "bugs": {
+        "url": "https://github.com/Fundable-Protocol/fundable-sdk/issues"
+    },
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./core": {
+            "types": "./dist/core/index.d.ts",
+            "import": "./dist/core/index.js"
+        },
+        "./stellar": {
+            "types": "./dist/stellar/index.d.ts",
+            "import": "./dist/stellar/index.js"
+        }
+    },
+    "scripts": {
+        "clean": "node scripts/clean.mjs",
+        "build": "pnpm clean && tsc",
+        "dev": "tsc --watch",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "prepack": "pnpm test && pnpm build"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "packageManager": "pnpm@10.18.0",
     "dependencies": {
-        "@stellar/stellar-sdk": "^14.4.3"
+        "@stellar/stellar-sdk": "^14.4.3",
+        "buffer": "^6.0.3"
     },
     "devDependencies": {
         "typescript": "^5",
-        "@types/node": "^20"
+        "@types/node": "^20",
+        "vitest": "^3.2.4"
     },
     "peerDependencies": {
         "@stellar/stellar-sdk": "^14.4.3"

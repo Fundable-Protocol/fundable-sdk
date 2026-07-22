@@ -1,93 +1,80 @@
 # @fundable/sdk
 
-TypeScript SDK for interacting with the Fundable Protocol's smart contracts on the Stellar network.
+Multichain TypeScript SDK for integrating Fundable token streams and
+distributions. Stellar is the first implemented chain adapter; the public
+domain types intentionally contain no Soroban-specific values so an EVM
+adapter can be added without changing application code.
 
-**Note:** This SDK is currently under development. The API is not yet stable and may change.
+> The `0.x` API is under active development.
 
-## Installation
+Detailed guides live in [`docs/`](./docs):
 
-Once published, you can install the SDK using your package manager of choice:
+- [Getting started](./docs/getting-started.md)
+- [Multichain architecture](./docs/multichain-architecture.md)
+- [Generated binding provenance](./docs/generated-bindings.md)
 
-```bash
-pnpm add @fundable/sdk
-# or
-npm install @fundable/sdk
-# or
-yarn add @fundable/sdk
-```
-
-## Peer Dependencies
-
-This SDK has a peer dependency on `@stellar/stellar-sdk`. You will need to have it installed in your project:
+## Install
 
 ```bash
-pnpm add @stellar/stellar-sdk
+pnpm add @fundable/sdk @stellar/stellar-sdk
 ```
 
----
+## Create a Stellar client
 
-## API Reference (Under Development)
+```ts
+import { createFundableClient } from "@fundable/sdk";
 
-The SDK will provide client classes for interacting with the deployed smart contracts.
-
-### `PaymentStreamClient` (Planned)
-
-The `PaymentStreamClient` will provide methods for interacting with the `payment-stream` contract.
-
--   **`createStream(...)`**: Create a new payment stream.
--   **`getStream(...)`**: Retrieve stream details.
--   **`withdrawableAmount(...)`**: Calculate the withdrawable amount for a stream.
--   **`withdraw(...)`**: Withdraw from a stream.
--   **`pauseStream(...)`**: Pause a stream.
--   **`resumeStream(...)`**: Resume a stream.
--   **`cancelStream(...)`**: Cancel a stream.
-
-### `DistributorClient` (Planned)
-
-The `DistributorClient` will provide methods for interacting with the `distributor` contract.
-
--   **`distributeEqual(...)`**: Distribute tokens equally to a list of recipients.
--   **`distributeWeighted(...)`**: Distribute tokens with weighted amounts to a list of recipients.
-
-### Data Structures
-
-#### `Stream`
-
-The `Stream` interface represents the data structure for a payment stream.
-
-```typescript
-export interface Stream {
-    id: bigint;
-    sender: string;
-    recipient: string;
-    token: string;
-    totalAmount: bigint;
-    withdrawnAmount: bigint;
-    startTime: bigint;
-    endTime: bigint;
-    status: "Active" | "Paused" | "Canceled" | "Completed";
-}
+const fundable = createFundableClient({
+  chain: "stellar",
+  network: "testnet",
+  rpcUrl: "https://soroban-testnet.stellar.org",
+  networkPassphrase: "Test SDF Network ; September 2015",
+  contracts: {
+    flow: "C...",
+  },
+});
 ```
 
-## Usage Example (Planned)
+The top-level client exposes capability groups. Flow is available in the first
+release:
 
-A usage example will be provided once the client classes are implemented.
+```ts
+const stream = await fundable.flows.getStream("42");
+const withdrawable = await fundable.flows.getWithdrawableAmount("42");
+```
 
-```typescript
-// Example of how the SDK might be used in the future
+Read methods return decoded domain values. Flow write methods currently target
+the Flow engine contract directly and return the Stellar SDK's
+`AssembledTransaction`, preserving simulation, signing, serialization, and
+advanced authorization workflows:
 
-import { PaymentStreamClient } from "@fundable/sdk";
-import { SorobanRpc } from "@stellar/stellar-sdk";
+```ts
+import { parseUnits } from "@fundable/sdk/core";
 
-const client = new PaymentStreamClient({
-    rpc: new SorobanRpc.Server("https://soroban-testnet.stellar.org"),
-    contractId: "YOUR_CONTRACT_ID",
+const transaction = await fundable.flows.deposit({
+  streamId: "42",
+  funder: "G...",
+  amount: parseUnits("100", 7),
 });
 
-async function main() {
-    const stream = await client.getStream(1);
-    console.log(stream);
-}
-
-main();
+const sent = await transaction.signAndSend();
+console.log(sent.result);
 ```
+
+Fundable's NFT-backed creation workflow goes through the Router contract. That
+orchestration and sponsored Paymaster execution remain application-owned in
+`0.1.0` and will move into dedicated SDK capabilities next; consumers should
+not use the engine-level `create` method when an NFT receipt is required.
+
+## Multichain boundary
+
+- `@fundable/sdk/core` contains chain-neutral inputs, records, errors, and unit
+  helpers.
+- `@fundable/sdk/stellar` contains Stellar configuration and transaction types.
+- Generated Soroban bindings remain internal and do not define the public
+  domain model.
+- A future `@fundable/sdk/evm` adapter can implement the same capability groups
+  while returning an EVM-native transaction handle.
+
+All on-chain integers use `bigint`. Use `parseUnits` and `formatUnits`; avoid
+floating-point arithmetic for token values.
