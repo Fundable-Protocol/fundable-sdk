@@ -40,3 +40,16 @@ Each adapter owns:
 Adapters may expose native transaction handles for advanced use cases. Common
 capability names do not require Stellar and EVM transaction internals to be
 identical.
+
+## Adding EVM later
+
+An EVM adapter should implement the shared capability inputs and normalized
+records, then own EVM-specific addresses, chain IDs, ABI encoding, simulation,
+gas estimation, wallet clients, transaction receipts, and error mapping.
+Applications can continue using shared token, schedule, stream, and amount
+types while narrowing to an adapter-native transaction handle when they need
+chain-specific behavior.
+
+Do not force Stellar authorization concepts into the EVM adapter or reduce
+both chains to an untyped transaction abstraction. The stable boundary is the
+Fundable operation and result model, not identical wallet internals.

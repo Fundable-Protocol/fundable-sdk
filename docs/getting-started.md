@@ -6,6 +6,13 @@
 pnpm add @fundable/sdk @stellar/stellar-sdk
 ```
 
+The SDK requires Node.js 20 or newer. npm and Yarn can install the same public
+package:
+
+```bash
+npm install @fundable/sdk @stellar/stellar-sdk
+```
+
 ## Configure Stellar
 
 ```ts
@@ -22,6 +29,10 @@ const fundable = createFundableClient({
 });
 ```
 
+Use environment-specific deployment addresses rather than copying the
+placeholders. See [Configuration](configuration.md) for optional Router, Stream
+NFT, Paymaster, signing, and server settings.
+
 Read calls return decoded values:
 
 ```ts
@@ -30,7 +41,8 @@ const withdrawable = await fundable.flows.getWithdrawableAmount("42");
 ```
 
 Write calls return a Stellar `AssembledTransaction`, allowing the application
-to choose its wallet and authorization workflow:
+to choose its wallet and authorization workflow. Configure the client with a
+connected public key and signing callbacks before submission:
 
 ```ts
 import { parseUnits } from "@fundable/sdk/core";
@@ -47,4 +59,5 @@ const result = await transaction.signAndSend();
 Router-based NFT creation, Stream NFT reads, and sponsored Paymaster execution
 are available when their contract IDs are supplied in the client configuration.
 See [Router, Stream NFT, and Paymaster](./router-paymaster.md) for the complete
-surface.
+surface and [Transactions](transactions.md) for authorization and result
+handling.

@@ -7,12 +7,21 @@ adapter can be added without changing application code.
 
 > The `0.x` API is under active development.
 
-Detailed guides live in [`docs/`](./docs):
+Detailed, GitBook-ready guides live in [`docs/`](./docs):
 
+- [Documentation home](./docs/README.md)
 - [Getting started](./docs/getting-started.md)
+- [Configuration](./docs/configuration.md)
+- [Flow streams](./docs/flows.md)
+- [Transactions and authorization](./docs/transactions.md)
+- [Example implementations](./docs/examples.md)
+- [Backend indexing](./docs/backend-indexing.md)
 - [Multichain architecture](./docs/multichain-architecture.md)
 - [Generated binding provenance](./docs/generated-bindings.md)
 - [Router, Stream NFT, and Paymaster development](./docs/router-paymaster.md)
+- [API reference](./docs/api-reference.md)
+- [Troubleshooting and versioning](./docs/troubleshooting-and-versioning.md)
+- [SDK delivery checklist](./docs/delivery-checklist.md)
 
 ## Install
 
