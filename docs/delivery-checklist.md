@@ -50,11 +50,11 @@ artifact, an automated check, or a public URL that proves completion.
 - [x] Check an allowed Paymaster fee token.
 - [x] Demonstrate wallet-controlled signing and submission without embedding
       a secret key.
-- [ ] Example source files pass TypeScript checking in CI.
+- [x] Example source files pass TypeScript checking in CI.
 
 ## 4. Release acceptance
 
-- [ ] Unit tests, type checking, build, documentation checks, and example
+- [x] Unit tests, type checking, build, documentation checks, and example
       checks pass in CI.
 - [x] The packed tarball contains only the intended runtime, type, README, and
       documentation files.
