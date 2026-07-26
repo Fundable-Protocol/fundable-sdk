@@ -30,5 +30,5 @@ code.
 6. Review [Generated bindings](generated-bindings.md) when validating contract
    and SDK release provenance.
 
-Review the [release process](releasing.md) for version compatibility and the
-[delivery checklist](delivery-checklist.md) for release acceptance evidence.
+Review [Troubleshooting and versioning](troubleshooting-and-versioning.md)
+before upgrading between SDK releases.

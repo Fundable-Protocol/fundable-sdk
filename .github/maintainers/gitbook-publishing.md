@@ -35,7 +35,7 @@ URL, then add the same URL to:
 
 Verify every navigation item, code block, table, and external link on desktop
 and mobile. Record that verification in the
-[delivery checklist](delivery-checklist.md).
+[delivery checklist](sdk-delivery-checklist.md).
 
 ## Release ownership
 

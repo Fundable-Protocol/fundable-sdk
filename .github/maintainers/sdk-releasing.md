@@ -8,7 +8,8 @@ token belongs in the repository.
 
 Before choosing a stable version:
 
-- every automated item in the [delivery checklist](delivery-checklist.md) is
+- every automated item in the
+  [delivery checklist](sdk-delivery-checklist.md) is
   checked;
 - the SDK API and compatible contract release are approved;
 - the public GitBook site is live and linked from repository metadata;
