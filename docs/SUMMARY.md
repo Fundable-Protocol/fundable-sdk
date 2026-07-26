@@ -1,0 +1,17 @@
+# Table of contents
+
+- [Fundable SDK](README.md)
+- [Getting started](getting-started.md)
+- [Configuration](configuration.md)
+- [Flow streams](flows.md)
+- [Transactions and authorization](transactions.md)
+- [Example implementations](examples.md)
+- [Backend indexing](backend-indexing.md)
+- [Multichain architecture](multichain-architecture.md)
+- [Router, Stream NFT, and Paymaster](router-paymaster.md)
+- [API reference](api-reference.md)
+- [Generated Stellar bindings](generated-bindings.md)
+- [Troubleshooting and versioning](troubleshooting-and-versioning.md)
+- [Publishing with GitBook](gitbook-publishing.md)
+- [Release process](releasing.md)
+- [Delivery checklist](delivery-checklist.md)

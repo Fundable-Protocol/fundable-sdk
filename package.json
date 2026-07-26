@@ -18,6 +18,7 @@
     "files": [
         "dist",
         "docs",
+        "examples",
         "README.md"
     ],
     "homepage": "https://github.com/Fundable-Protocol/fundable-sdk#readme",
@@ -50,7 +51,17 @@
         "test": "vitest run",
         "test:testnet": "FUNDABLE_TESTNET_INTEGRATION=1 vitest run src/stellar/testnet.integration.test.ts",
         "typecheck": "tsc --noEmit",
-        "prepack": "pnpm test && pnpm build"
+        "docs:check": "node scripts/check-doc-links.mjs",
+        "examples:typecheck": "pnpm build && tsc -p examples/tsconfig.json",
+        "example:read-flow": "pnpm build && tsx examples/read-flow.ts",
+        "example:create-router-flow": "pnpm build && tsx examples/create-router-flow.ts",
+        "example:create-router-lockup": "pnpm build && tsx examples/create-router-lockup.ts",
+        "example:withdraw-router": "pnpm build && tsx examples/withdraw-router.ts",
+        "example:read-stream-nft": "pnpm build && tsx examples/read-stream-nft.ts",
+        "example:check-paymaster": "pnpm build && tsx examples/check-paymaster.ts",
+        "package:verify": "node scripts/verify-packed-package.mjs",
+        "verify": "pnpm test && pnpm typecheck && pnpm examples:typecheck && pnpm docs:check",
+        "prepack": "pnpm verify"
     },
     "engines": {
         "node": ">=20"
@@ -61,8 +72,9 @@
         "buffer": "^6.0.3"
     },
     "devDependencies": {
-        "typescript": "^5",
         "@types/node": "^20",
+        "tsx": "^4.23.1",
+        "typescript": "^5",
         "vitest": "^3.2.4"
     },
     "peerDependencies": {
