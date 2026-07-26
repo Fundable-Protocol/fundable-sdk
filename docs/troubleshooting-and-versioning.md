@@ -46,16 +46,16 @@ The SDK follows semantic versioning:
 - minor releases add backward-compatible capabilities;
 - major releases may change public types or behavior.
 
-Until `1.0.0`, minor `0.x` releases may contain breaking changes. Prerelease
-versions such as `0.1.0-alpha.3` are published under npm's `next` tag and must
-not be treated as stable.
+Until `1.0.0`, minor `0.x` releases may contain breaking changes. Stable
+versions are published under npm's `latest` tag. Prerelease versions containing
+a hyphen are published under `next` and must not be treated as stable.
 
-Pin an exact prerelease in production:
+Pin an exact version in production:
 
 ```json
 {
   "dependencies": {
-    "@fundable/sdk": "0.1.0-alpha.3"
+    "@fundable/sdk": "0.1.0"
   }
 }
 ```

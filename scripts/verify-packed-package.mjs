@@ -45,6 +45,7 @@ try {
   const requiredEntries = [
     "package/package.json",
     "package/README.md",
+    "package/CHANGELOG.md",
     "package/dist/index.js",
     "package/dist/index.d.ts",
     "package/docs/README.md",
