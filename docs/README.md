@@ -30,6 +30,5 @@ code.
 6. Review [Generated bindings](generated-bindings.md) when validating contract
    and SDK release provenance.
 
-The package is currently a prerelease. Review the
-[delivery checklist](delivery-checklist.md) for the remaining work required
-before the SDK is promoted to a stable release.
+Review the [release process](releasing.md) for version compatibility and the
+[delivery checklist](delivery-checklist.md) for release acceptance evidence.

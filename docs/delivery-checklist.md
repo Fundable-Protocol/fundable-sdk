@@ -35,7 +35,7 @@ artifact, an automated check, or a public URL that proves completion.
 - [x] Versioning, generated-binding provenance, and troubleshooting are
       documented.
 - [x] All internal documentation links pass an automated check.
-- [ ] The GitBook space is connected to this repository and its public URL is
+- [x] The GitBook space is connected to this repository and its public URL is
       added to `package.json` and the repository README.
 
 ## 3. Example readiness
@@ -61,7 +61,8 @@ artifact, an automated check, or a public URL that proves completion.
 - [x] A clean project can install the packed SDK and compile a representative
       consumer.
 - [x] A testnet smoke test verifies documented read and simulation workflows.
-- [ ] GitBook pages render correctly on desktop and mobile.
+- [x] GitBook pages render correctly on desktop.
+- [ ] GitBook pages render correctly on mobile.
 - [ ] The stable npm package, GitBook URL, examples, source tag, and contract
       provenance all cross-link to one another.
 

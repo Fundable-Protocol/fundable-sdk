@@ -5,7 +5,10 @@ distributions. Stellar is the first implemented chain adapter; the public
 domain types intentionally contain no Soroban-specific values so an EVM
 adapter can be added without changing application code.
 
-> The `0.x` API is under active development.
+**Documentation:** [Fundable SDK on GitBook](https://fundable-finance.gitbook.io/fundable-finance-docs/)
+
+> The `0.x` API remains under active development. Review release notes before
+> upgrading between minor versions.
 
 Detailed, GitBook-ready guides live in [`docs/`](./docs):
 
