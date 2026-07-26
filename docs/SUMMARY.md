@@ -12,6 +12,3 @@
 - [API reference](api-reference.md)
 - [Generated Stellar bindings](generated-bindings.md)
 - [Troubleshooting and versioning](troubleshooting-and-versioning.md)
-- [Publishing with GitBook](gitbook-publishing.md)
-- [Release process](releasing.md)
-- [Delivery checklist](delivery-checklist.md)

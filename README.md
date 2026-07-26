@@ -24,7 +24,6 @@ Detailed, GitBook-ready guides live in [`docs/`](./docs):
 - [Router, Stream NFT, and Paymaster development](./docs/router-paymaster.md)
 - [API reference](./docs/api-reference.md)
 - [Troubleshooting and versioning](./docs/troubleshooting-and-versioning.md)
-- [SDK delivery checklist](./docs/delivery-checklist.md)
 
 ## Install
 
