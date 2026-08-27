@@ -1,84 +1,89 @@
 {
-    "name": "@fundable/sdk",
-    "version": "0.1.0",
-    "private": false,
-    "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Fundable-Protocol/fundable-sdk.git"
+  "name": "@fundable/sdk",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fundable-Protocol/fundable-sdk.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "docs",
+    "examples",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "homepage": "https://fundable-finance.gitbook.io/fundable-finance-docs/",
+  "bugs": {
+    "url": "https://github.com/Fundable-Protocol/fundable-sdk/issues"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
-    "publishConfig": {
-        "access": "public",
-        "registry": "https://registry.npmjs.org"
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
     },
-    "type": "module",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist",
-        "docs",
-        "examples",
-        "CHANGELOG.md",
-        "README.md"
-    ],
-    "homepage": "https://fundable-finance.gitbook.io/fundable-finance-docs/",
-    "bugs": {
-        "url": "https://github.com/Fundable-Protocol/fundable-sdk/issues"
+    "./stellar": {
+      "types": "./dist/stellar/index.d.ts",
+      "import": "./dist/stellar/index.js"
     },
-    "sideEffects": false,
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js"
-        },
-        "./core": {
-            "types": "./dist/core/index.d.ts",
-            "import": "./dist/core/index.js"
-        },
-        "./stellar": {
-            "types": "./dist/stellar/index.d.ts",
-            "import": "./dist/stellar/index.js"
-        }
-    },
-    "scripts": {
-        "clean": "node scripts/clean.mjs",
-        "build": "pnpm clean && tsc",
-        "dev": "tsc --watch",
-        "generate:flow": "node scripts/generate-stellar-binding.mjs flow",
-        "generate:router": "node scripts/generate-stellar-binding.mjs router",
-        "generate:stream-nft": "node scripts/generate-stellar-binding.mjs stream_nft",
-        "generate:paymaster": "node scripts/generate-stellar-binding.mjs paymaster",
-        "test": "vitest run",
-        "test:testnet": "FUNDABLE_TESTNET_INTEGRATION=1 vitest run src/stellar/testnet.integration.test.ts",
-        "typecheck": "tsc --noEmit",
-        "docs:check": "node scripts/check-doc-links.mjs",
-        "examples:typecheck": "pnpm build && tsc -p examples/tsconfig.json",
-        "example:read-flow": "pnpm build && tsx examples/read-flow.ts",
-        "example:create-router-flow": "pnpm build && tsx examples/create-router-flow.ts",
-        "example:create-router-lockup": "pnpm build && tsx examples/create-router-lockup.ts",
-        "example:withdraw-router": "pnpm build && tsx examples/withdraw-router.ts",
-        "example:read-stream-nft": "pnpm build && tsx examples/read-stream-nft.ts",
-        "example:check-paymaster": "pnpm build && tsx examples/check-paymaster.ts",
-        "package:verify": "node scripts/verify-packed-package.mjs",
-        "verify": "pnpm test && pnpm typecheck && pnpm examples:typecheck && pnpm docs:check",
-        "prepack": "pnpm verify"
-    },
-    "engines": {
-        "node": ">=20"
-    },
-    "packageManager": "pnpm@10.18.0",
-    "dependencies": {
-        "@stellar/stellar-sdk": "^14.4.3",
-        "buffer": "^6.0.3"
-    },
-    "devDependencies": {
-        "@types/node": "^20",
-        "tsx": "^4.23.1",
-        "typescript": "^5",
-        "vitest": "^3.2.4"
-    },
-    "peerDependencies": {
-        "@stellar/stellar-sdk": "^14.4.3"
+    "./audit": {
+      "types": "./dist/audit/index.d.ts",
+      "import": "./dist/audit/index.js"
     }
+  },
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "build": "pnpm clean && tsc",
+    "dev": "tsc --watch",
+    "generate:flow": "node scripts/generate-stellar-binding.mjs flow",
+    "generate:router": "node scripts/generate-stellar-binding.mjs router",
+    "generate:stream-nft": "node scripts/generate-stellar-binding.mjs stream_nft",
+    "generate:paymaster": "node scripts/generate-stellar-binding.mjs paymaster",
+    "test": "vitest run",
+    "test:testnet": "FUNDABLE_TESTNET_INTEGRATION=1 vitest run src/stellar/testnet.integration.test.ts",
+    "typecheck": "tsc --noEmit",
+    "docs:check": "node scripts/check-doc-links.mjs",
+    "examples:typecheck": "pnpm build && tsc -p examples/tsconfig.json",
+    "example:read-flow": "pnpm build && tsx examples/read-flow.ts",
+    "example:create-router-flow": "pnpm build && tsx examples/create-router-flow.ts",
+    "example:create-router-lockup": "pnpm build && tsx examples/create-router-lockup.ts",
+    "example:withdraw-router": "pnpm build && tsx examples/withdraw-router.ts",
+    "example:read-stream-nft": "pnpm build && tsx examples/read-stream-nft.ts",
+    "example:check-paymaster": "pnpm build && tsx examples/check-paymaster.ts",
+    "example:verify-anchored-payout": "pnpm build && tsx examples/verify-anchored-payout.ts",
+    "package:verify": "node scripts/verify-packed-package.mjs",
+    "verify": "pnpm test && pnpm typecheck && pnpm examples:typecheck && pnpm docs:check",
+    "prepack": "pnpm verify"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.18.0",
+  "dependencies": {
+    "@stellar/stellar-sdk": "^14.4.3",
+    "buffer": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.23.1",
+    "typescript": "^5",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@stellar/stellar-sdk": "^14.4.3"
+  }
 }
