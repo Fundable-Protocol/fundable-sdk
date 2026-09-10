@@ -1,6 +1,6 @@
 {
     "name": "@fundable/sdk",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "private": false,
     "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
     "license": "MIT",
@@ -46,6 +46,7 @@
         "build": "pnpm clean && tsc",
         "dev": "tsc --watch",
         "generate:flow": "node scripts/generate-stellar-binding.mjs flow",
+        "generate:lockup": "node scripts/generate-stellar-binding.mjs lockup",
         "generate:router": "node scripts/generate-stellar-binding.mjs router",
         "generate:stream-nft": "node scripts/generate-stellar-binding.mjs stream_nft",
         "generate:paymaster": "node scripts/generate-stellar-binding.mjs paymaster",

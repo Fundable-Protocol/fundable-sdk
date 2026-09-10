@@ -16,9 +16,11 @@ import type { StellarFundableClientConfig } from "@fundable/sdk/stellar";
 | Property | Availability |
 | --- | --- |
 | `flows` | Always present; `contracts.flow` is required. |
+| `lockups` | Present when `contracts.lockup` is configured. |
 | `router` | Present when `contracts.router` is configured. |
 | `streamNft` | Present when `contracts.streamNft` is configured. |
-| `paymaster` | Present when `contracts.paymaster` is configured. |
+| `sponsorship` | Present when `sponsorship.backendUrl` is configured. |
+| `paymaster` | Deprecated; migration-only when `contracts.paymaster` is configured. |
 
 ## Flow client
 
@@ -40,6 +42,17 @@ import type { StellarFundableClientConfig } from "@fundable/sdk/stellar";
 | `createLockup` | Assembled transaction returning Stream NFT token ID. |
 | `withdraw` | Assembled transaction for an amount and token ID. |
 | `withdrawMax` | Assembled transaction returning the withdrawn amount. |
+| `ownerOf`, `statusOf`, `coreStreamId` | Canonical reads keyed by NFT token ID. |
+| `getStream` | Owner, type, status, transferability, token ID, and core ID. |
+| `voidFlow` | NFT-owner Flow void transaction. |
+
+## Lockup client
+
+| Method | Result |
+| --- | --- |
+| `cancel`, `renounce` | Sender-authorized Lockup transactions using a core stream ID. |
+| `statusOf`, `isCancelable` | Current Lockup lifecycle and cancellation state. |
+| `withdrawableAmount`, `refundableAmount` | Current amounts as `bigint`. |
 
 ## Stream NFT client
 
@@ -48,7 +61,21 @@ import type { StellarFundableClientConfig } from "@fundable/sdk/stellar";
 | `ownerOf` | Owner Stellar address. |
 | `balanceOf` | Number of Stream NFTs owned as `bigint`. |
 | `getStreamData` | `{ tokenId, streamId, streamKind }`. |
+| `isTransferable` | Immutable on-chain transfer policy. |
 | `transfer` | Assembled transfer transaction. |
+
+## Sponsorship client
+
+| Method | Result |
+| --- | --- |
+| `authenticate` | Signed-wallet backend session. |
+| `quote` | Fee token, estimate, maximum, and conversion rate. |
+| `build` | FeeForwarder transaction, user auth entry, and expiration. |
+| `submit` | Durable IDs, status, transaction hash, and confirmed NFT token ID. |
+| `isBuildExpired` | Whether a build must be rebuilt before signing or submission. |
+
+`fundable.signSponsorshipAuthorization(build)` signs the backend-issued user
+authorization entry with the configured wallet callback.
 
 ## Paymaster client
 
@@ -89,6 +116,7 @@ try {
 
 The stable error codes are `INVALID_ARGUMENT`, `INVALID_CONFIGURATION`,
 `UNSUPPORTED_CHAIN`, `UNSUPPORTED_CAPABILITY`, `SIMULATION_FAILED`,
-`TRANSACTION_FAILED`, and `RPC_UNAVAILABLE`. The underlying failure may be
+`TRANSACTION_FAILED`, `RPC_UNAVAILABLE`, `API_REQUEST_FAILED`,
+`AUTHENTICATION_REQUIRED`, and `AUTHORIZATION_EXPIRED`. The underlying failure may be
 available as `error.cause`; do not display raw provider responses to end users
 without filtering sensitive data.

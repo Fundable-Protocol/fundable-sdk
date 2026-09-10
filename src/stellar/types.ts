@@ -2,6 +2,7 @@ import type {
   ClientOptions as ContractClientOptions,
   MethodOptions,
 } from "@stellar/stellar-sdk/contract";
+import type { StellarSponsorshipClientConfig } from "./sponsorship-client.js";
 
 export const STELLAR_NETWORKS = {
   PUBLIC: "public",
@@ -32,6 +33,7 @@ export interface StellarFundableClientConfig {
   headers?: Record<string, string>;
   signTransaction?: ContractClientOptions["signTransaction"];
   signAuthEntry?: ContractClientOptions["signAuthEntry"];
+  sponsorship?: StellarSponsorshipClientConfig;
 }
 
 export type StellarMethodOptions = MethodOptions;

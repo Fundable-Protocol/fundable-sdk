@@ -71,6 +71,21 @@ export class StellarStreamNftClient {
     }
   }
 
+  async isTransferable(tokenId: string | bigint): Promise<boolean> {
+    try {
+      const transaction = await this.client.is_transferable({
+        token_id: toTokenId(tokenId),
+      });
+      return transaction.result;
+    } catch (error) {
+      throw toFundableError(
+        error,
+        "Failed to load stream NFT transferability.",
+        "stellar",
+      );
+    }
+  }
+
   async transfer(
     input: TransferStreamNftInput,
     options?: StellarMethodOptions,

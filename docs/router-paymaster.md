@@ -1,4 +1,8 @@
-# Router, Stream NFT, and Paymaster development
+# Router, Stream NFT, and legacy Paymaster development
+
+> The custom Fundable Paymaster is deprecated and retained for migration only.
+> Production applications must use the backend-mediated sponsorship API
+> documented in [Sponsored transactions](sponsorship.md).
 
 These capabilities are available from `0.1.0-alpha.2`. Router Lockup creation
 is available from `0.1.0-alpha.3`.

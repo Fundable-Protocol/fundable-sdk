@@ -9,6 +9,7 @@ import type { StellarFundableClientConfig, StellarMethodOptions } from "./types.
 import type { StellarTransaction } from "./flow-client.js";
 import { assertPositive, assertStellarAddress } from "./validation.js";
 
+/** @deprecated The Fundable Paymaster is retained for migration only. */
 export class StellarPaymasterClient {
   private readonly client: GeneratedPaymasterClient;
 

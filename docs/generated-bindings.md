@@ -70,3 +70,21 @@ bindings are compiled into the SDK behind chain-neutral high-level clients.
 
 `0.1.0-alpha.3` adds the high-level Lockup Router mapping without changing the
 generated bindings or contract artifacts, so it retains this exact provenance.
+
+## Mainnet-readiness release provenance
+
+- Contract commit: `62dfc41ac8c1fa48d66c5fe5e9c7e98f9e4f9529`
+- Stellar CLI: `stellar 27.0.0`
+
+Reproducible WASM SHA-256 values:
+
+| Contract | SHA-256 |
+| --- | --- |
+| Flow | `6201c10afc509b53bf3a9bb307730ee996accdcc4f17864126bbd8aa576dbee6` |
+| Lockup | `500f152a8ffb8126e36af6df149eee5712c9a575b9c1979142de2619fe8920d3` |
+| Router | `c1ddde9e7679fd1068523a7994a7fbc1390a0a98526ccfba0a317886f36b6f09` |
+| Stream NFT | `0e6440a0a2108b254459988c214bcb225ddd838fabdb7623450a65ccbdeddb63` |
+
+The SDK `0.2.0` bindings were generated from the four reproducible release
+artifacts with the corresponding `pnpm generate:* -- /absolute/path.wasm`
+commands. The transitional Paymaster was intentionally not regenerated.
