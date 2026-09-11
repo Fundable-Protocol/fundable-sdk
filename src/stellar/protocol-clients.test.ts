@@ -6,13 +6,27 @@ const generated = vi.hoisted(() => ({
   createFlow: vi.fn(),
   createLockup: vi.fn(),
   getStreamData: vi.fn(),
+  getStream: vi.fn(),
+  isTransferable: vi.fn(),
+  cancelLockup: vi.fn(),
+  lockupStatus: vi.fn(),
   forward: vi.fn(),
 }));
 
 vi.mock("../generated/router/src/index.js", () => ({
+  CanonicalStreamStatus: {
+    Pending: 0,
+    Active: 1,
+    Paused: 2,
+    Canceled: 3,
+    Completed: 4,
+    Failed: 5,
+  },
+  StreamType: { Flow: 0, Lockup: 1 },
   Client: class {
     create_flow_stream = generated.createFlow;
     create_lockup_stream = generated.createLockup;
+    get_stream = generated.getStream;
   },
 }));
 
@@ -20,6 +34,7 @@ vi.mock("../generated/stream_nft/src/index.js", () => ({
   StreamType: { Flow: 0, Lockup: 1 },
   Client: class {
     get_stream_data = generated.getStreamData;
+    is_transferable = generated.isTransferable;
   },
 }));
 
@@ -29,7 +44,22 @@ vi.mock("../generated/paymaster/src/index.js", () => ({
   },
 }));
 
+vi.mock("../generated/lockup/src/index.js", () => ({
+  LockupStatus: {
+    Pending: 0,
+    Streaming: 1,
+    Settled: 2,
+    Canceled: 3,
+    Depleted: 4,
+  },
+  Client: class {
+    cancel = generated.cancelLockup;
+    status_of = generated.lockupStatus;
+  },
+}));
+
 import { StellarPaymasterClient } from "./paymaster-client.js";
+import { StellarLockupClient } from "./lockup-client.js";
 import { StellarRouterClient } from "./router-client.js";
 import { StellarStreamNftClient } from "./stream-nft-client.js";
 
@@ -76,6 +106,8 @@ describe("Stellar protocol clients", () => {
         rate_per_second: 10n ** 18n,
         token_decimals: 7,
         start_time: 123n,
+        initial_amount: 0n,
+        transferable: false,
       },
       undefined,
     );
@@ -103,6 +135,7 @@ describe("Stellar protocol clients", () => {
       cliffUnlockAmount: 20n,
       granularitySeconds: 60n,
       cancelable: true,
+      transferable: true,
     });
 
     expect(generated.createLockup).toHaveBeenCalledWith(
@@ -120,6 +153,7 @@ describe("Stellar protocol clients", () => {
           granularity: 60n,
           cancelable: true,
         },
+        transferable: true,
       },
       undefined,
     );
@@ -157,6 +191,60 @@ describe("Stellar protocol clients", () => {
       streamId: "42",
       streamKind: "flow",
     });
+  });
+
+  it("loads canonical Router metadata by public NFT token ID", async () => {
+    const owner = Keypair.random().publicKey();
+    generated.getStream.mockResolvedValue({
+      result: {
+        token_id: 7n,
+        core_stream_id: 42n,
+        stream_type: 1,
+        status: 3,
+        owner,
+        transferable: true,
+      },
+    });
+    const client = new StellarRouterClient({
+      ...baseConfig,
+      contracts: { ...baseConfig.contracts, router: contractId(1) },
+    });
+
+    await expect(client.getStream("7")).resolves.toEqual({
+      tokenId: "7",
+      coreStreamId: "42",
+      streamKind: "lockup",
+      status: "canceled",
+      owner,
+      transferable: true,
+    });
+  });
+
+  it("reads immutable NFT transferability", async () => {
+    generated.isTransferable.mockResolvedValue({ result: false });
+    const client = new StellarStreamNftClient({
+      ...baseConfig,
+      contracts: { ...baseConfig.contracts, streamNft: contractId(3) },
+    });
+
+    await expect(client.isTransferable("7")).resolves.toBe(false);
+  });
+
+  it("routes sender cancellation through the Lockup core contract", async () => {
+    const sender = Keypair.random().publicKey();
+    generated.cancelLockup.mockResolvedValue({ result: 50n });
+    generated.lockupStatus.mockResolvedValue({ result: 3 });
+    const client = new StellarLockupClient({
+      ...baseConfig,
+      contracts: { ...baseConfig.contracts, lockup: contractId(4) },
+    });
+
+    await client.cancel({ streamId: "42", sender });
+    await expect(client.statusOf("42")).resolves.toBe("canceled");
+    expect(generated.cancelLockup).toHaveBeenCalledWith(
+      { stream_id: 42n, sender },
+      undefined,
+    );
   });
 
   it("maps a bounded Paymaster forward request", async () => {

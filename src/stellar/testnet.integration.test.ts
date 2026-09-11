@@ -1,4 +1,4 @@
-import { Asset, Keypair, Networks } from "@stellar/stellar-sdk";
+import { Networks } from "@stellar/stellar-sdk";
 import { describe, expect, it } from "vitest";
 import { createFundableClient } from "../client.js";
 
@@ -8,21 +8,25 @@ const deployment = {
   admin:
     process.env.FUNDABLE_TESTNET_ADMIN ??
     "GDZJSPRSBTAJPAQ4NG6Y2ZCWHEX5HMS253TYVNAQJRPJHY27JPOHBIPZ",
+  owner:
+    process.env.FUNDABLE_TESTNET_STREAM_OWNER ??
+    "GA4F3SQXOA6JETFYL4SG5JX7KGKDIU7RGFPUD3RNZTERVQODYUHYDACN",
   flow:
     process.env.FUNDABLE_TESTNET_FLOW ??
-    "CCX3BJBDAORZI2QI7LS44RBJ7OT7HYZBXIXKC7UVMGS5SV766UUKRM2B",
+    "CAD57D33XJAHR7LSJVJU3MCFU3UMU72NK56GGLWDIKYZDSZICILSUKCY",
+  lockup:
+    process.env.FUNDABLE_TESTNET_LOCKUP ??
+    "CBJRYJRQ24LP4DKKTUSVPCICLMMXIG7ZW5M4M7VNJUXGKDPBJ322ADT2",
   router:
     process.env.FUNDABLE_TESTNET_ROUTER ??
-    "CCKPJ3QNP7M2OY3PIMYSGBKY3PVPTZXHRW6RBV5EMWKRZQ2P64JRFVCP",
+    "CAWZ5DGA6DTNG6GAF4O534SOP277JKZ6URTP3EE2KTBC3RM4YR4PQD7J",
   streamNft:
     process.env.FUNDABLE_TESTNET_STREAM_NFT ??
-    "CBKWSE5M6PJ3JYYMMPWKNZ4T6H6EM77QZIQQFNHCRCECAP53ZKCETR5P",
-  paymaster:
-    process.env.FUNDABLE_TESTNET_PAYMASTER ??
-    "CD4DQI4RKCPHGNROBXS4QWNGAHMYDTJK3GEGJZWLQFAWAVO6CYPSIXMM",
+    "CCYMOIEL3ID55C4DFQAGZEGJT4KEXM5OHIRJROZRLTLAO3EMSSHJIGLY",
+  tokenId: process.env.FUNDABLE_TESTNET_STREAM_TOKEN_ID ?? "1",
 };
 
-describe.runIf(runIntegration)("Fundable tagged testnet deployment", () => {
+describe.runIf(runIntegration)("Fundable mainnet-readiness testnet deployment", () => {
   const client = createFundableClient({
     chain: "stellar",
     network: "testnet",
@@ -33,53 +37,37 @@ describe.runIf(runIntegration)("Fundable tagged testnet deployment", () => {
     publicKey: deployment.admin,
     contracts: {
       flow: deployment.flow,
+      lockup: deployment.lockup,
       router: deployment.router,
       streamNft: deployment.streamNft,
-      paymaster: deployment.paymaster,
     },
   });
 
-  it("reads Stream NFT and Paymaster state through the public clients", async () => {
-    await expect(client.streamNft?.balanceOf(deployment.admin)).resolves.toEqual(
-      expect.any(BigInt),
+  it("reads canonical Router metadata by public NFT token ID", async () => {
+    await expect(client.router?.getStream(deployment.tokenId)).resolves.toEqual(
+      expect.objectContaining({
+        tokenId: deployment.tokenId,
+        coreStreamId: "1",
+        streamKind: "lockup",
+        owner: deployment.owner,
+        transferable: true,
+      }),
+    );
+  });
+
+  it("reads Stream NFT ownership and transferability", async () => {
+    await expect(client.streamNft?.ownerOf(deployment.tokenId)).resolves.toBe(
+      deployment.owner,
     );
     await expect(
-      client.paymaster?.isFeeTokenAllowed(
-        Asset.native().contractId(Networks.TESTNET),
-      ),
-    ).resolves.toEqual(expect.any(Boolean));
+      client.streamNft?.isTransferable(deployment.tokenId),
+    ).resolves.toBe(true);
   });
 
-  it("simulates Router flow creation without submitting a transaction", async () => {
-    const transaction = await client.router?.createFlow({
-      sender: deployment.admin,
-      recipient: Keypair.random().publicKey(),
-      token: {
-        address: Asset.native().contractId(Networks.TESTNET),
-        decimals: 7,
-      },
-      ratePerSecond: 1n,
-      startTime: BigInt(Math.floor(Date.now() / 1_000) + 30),
-    });
-
-    expect(transaction?.result).toEqual(expect.any(BigInt));
-  });
-
-  it("simulates Router Lockup creation without submitting a transaction", async () => {
-    const startTime = BigInt(Math.floor(Date.now() / 1_000) + 30);
-    const transaction = await client.router?.createLockup({
-      sender: deployment.admin,
-      recipient: Keypair.random().publicKey(),
-      token: {
-        address: Asset.native().contractId(Networks.TESTNET),
-        decimals: 7,
-      },
-      totalAmount: 1n,
-      startTime,
-      endTime: startTime + 3_600n,
-      granularitySeconds: 1n,
-    });
-
-    expect(transaction?.result).toEqual(expect.any(BigInt));
+  it("reads the underlying Lockup lifecycle through the core mapping", async () => {
+    const coreStreamId = await client.router?.coreStreamId(deployment.tokenId);
+    await expect(client.lockups?.statusOf(coreStreamId!)).resolves.toMatch(
+      /^(pending|streaming|settled|canceled|depleted)$/,
+    );
   });
 });

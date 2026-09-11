@@ -15,8 +15,8 @@ const fundable = createFundableClient({
     flow: process.env.FUNDABLE_FLOW_CONTRACT!,
     router: process.env.FUNDABLE_ROUTER_CONTRACT,
     streamNft: process.env.FUNDABLE_STREAM_NFT_CONTRACT,
-    paymaster: process.env.FUNDABLE_PAYMASTER_CONTRACT,
   },
+  sponsorship: { backendUrl: process.env.FUNDABLE_BACKEND_URL! },
   publicKey: connectedAccount,
   signTransaction: wallet.signTransaction,
   signAuthEntry: wallet.signAuthEntry,
@@ -39,8 +39,8 @@ cross-network signing errors.
 
 ## Optional capabilities
 
-`router`, `streamNft`, and `paymaster` are only present on the client when the
-matching contract ID is configured:
+`router`, `streamNft`, and `sponsorship` are only present on the client when
+their corresponding contract ID or backend URL is configured:
 
 ```ts
 if (!fundable.router) {
@@ -50,6 +50,10 @@ if (!fundable.router) {
 
 This makes a missing deployment explicit instead of sending a transaction to
 an invented or stale address.
+
+The custom `paymaster` contract option is deprecated and must not be used for
+production sponsorship. Configure `sponsorship.backendUrl` to use the
+backend-validated OpenZeppelin FeeForwarder flow.
 
 ## Signing callbacks
 

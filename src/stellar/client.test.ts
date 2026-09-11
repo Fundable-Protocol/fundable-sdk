@@ -1,5 +1,5 @@
 import { StrKey } from "@stellar/stellar-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { FundableError } from "../core/index.js";
 import { createFundableClient } from "../client.js";
 
@@ -33,7 +33,7 @@ describe("createFundableClient", () => {
     ).toThrow(FundableError);
   });
 
-  it("enables optional Router, Stream NFT, and Paymaster capabilities", () => {
+  it("enables optional Lockup, Router, Stream NFT, and Paymaster capabilities", () => {
     const client = createFundableClient({
       chain: "stellar",
       network: "testnet",
@@ -41,6 +41,7 @@ describe("createFundableClient", () => {
       networkPassphrase: "Test SDF Network ; September 2015",
       contracts: {
         flow: contractId(),
+        lockup: contractId(),
         router: contractId(),
         streamNft: contractId(),
         paymaster: contractId(),
@@ -48,7 +49,46 @@ describe("createFundableClient", () => {
     });
 
     expect(client.router).toBeDefined();
+    expect(client.lockups).toBeDefined();
     expect(client.streamNft).toBeDefined();
     expect(client.paymaster).toBeDefined();
+  });
+
+  it("signs a current sponsorship build with the configured wallet", async () => {
+    const signAuthEntry = vi.fn(async () => ({
+      signedAuthEntry: "signed-entry",
+      signerAddress: "GACCOUNT",
+    }));
+    const client = createFundableClient({
+      chain: "stellar",
+      network: "testnet",
+      rpcUrl: "https://rpc.example.com",
+      networkPassphrase: "Test SDF Network ; September 2015",
+      contracts: { flow: contractId() },
+      publicKey: "GACCOUNT",
+      signAuthEntry,
+      sponsorship: {
+        backendUrl: "https://api.example.com",
+        accessToken: "session-token",
+      },
+    });
+
+    await expect(
+      client.signSponsorshipAuthorization({
+        transactionXdr: "built-xdr",
+        userAuthEntry: "auth-entry",
+        feeToken: "CFEE",
+        networkFeeStroops: "100",
+        estimatedFee: "123",
+        estimatedFeeUi: "0.0000123",
+        maximumFee: "130",
+        maximumFeeUi: "0.0000130",
+        validUntil: "2030-01-01T00:00:00.000Z",
+      }),
+    ).resolves.toBe("signed-entry");
+    expect(signAuthEntry).toHaveBeenCalledWith("auth-entry", {
+      networkPassphrase: "Test SDF Network ; September 2015",
+      address: "GACCOUNT",
+    });
   });
 });

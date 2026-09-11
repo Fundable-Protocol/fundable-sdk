@@ -2,6 +2,28 @@
 
 All notable changes to `@fundable/sdk` are documented here.
 
+## 0.2.0
+
+Mainnet-readiness integration release.
+
+### Added
+
+- authenticated Stellar wallet sessions for the Fundable backend;
+- typed sponsorship quote, build, authorization signing, and idempotent submit;
+- explicit sponsorship fee and authorization-expiration fields;
+- canonical Router stream metadata, status, owner, and core-ID reads;
+- first-class Lockup cancellation, status, and amount reads;
+- immutable Stream NFT transferability reads;
+- Router Flow initial funding and per-stream transferability inputs.
+
+### Changed
+
+- regenerated Flow, Lockup, Router, and Stream NFT bindings from the verified
+  mainnet-readiness release artifacts;
+- distinguished confirmed Stream NFT token IDs from transaction hashes in
+  sponsorship results;
+- marked the custom Fundable Paymaster client as deprecated and migration-only.
+
 ## 0.1.0
 
 First stable Fundable SDK release.

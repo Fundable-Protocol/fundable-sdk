@@ -18,6 +18,17 @@ export const FLOW_STATUSES = {
 export type FlowStatus =
   (typeof FLOW_STATUSES)[keyof typeof FLOW_STATUSES];
 
+export const LOCKUP_STATUSES = {
+  PENDING: "pending",
+  STREAMING: "streaming",
+  SETTLED: "settled",
+  CANCELED: "canceled",
+  DEPLETED: "depleted",
+} as const;
+
+export type LockupStatus =
+  (typeof LOCKUP_STATUSES)[keyof typeof LOCKUP_STATUSES];
+
 export interface TokenReference {
   address: string;
   decimals: number;
@@ -43,6 +54,8 @@ export interface CreateFlowInput {
   token: TokenReference;
   ratePerSecond: bigint;
   startTime?: bigint | Date;
+  initialAmount?: bigint;
+  transferable?: boolean;
 }
 
 export interface CreateAndDepositFlowInput extends CreateFlowInput {
@@ -61,6 +74,7 @@ export interface CreateLockupInput {
   cliffUnlockAmount?: bigint;
   granularitySeconds?: bigint;
   cancelable?: boolean;
+  transferable?: boolean;
 }
 
 export interface FlowAmountInput {
@@ -97,11 +111,37 @@ export const STREAM_KINDS = {
 
 export type StreamKind = (typeof STREAM_KINDS)[keyof typeof STREAM_KINDS];
 
+export const CANONICAL_STREAM_STATUSES = {
+  PENDING: "pending",
+  ACTIVE: "active",
+  PAUSED: "paused",
+  CANCELED: "canceled",
+  COMPLETED: "completed",
+  FAILED: "failed",
+} as const;
+
+export type CanonicalStreamStatus =
+  (typeof CANONICAL_STREAM_STATUSES)[keyof typeof CANONICAL_STREAM_STATUSES];
+
+export interface StreamMetadata {
+  tokenId: string;
+  coreStreamId: string;
+  streamKind: StreamKind;
+  status: CanonicalStreamStatus;
+  owner: string;
+  transferable: boolean;
+}
+
 export interface RouterWithdrawInput {
   tokenId: string | bigint;
   caller: string;
   to: string;
   amount: bigint;
+}
+
+export interface LockupActorInput {
+  streamId: string | bigint;
+  sender: string;
 }
 
 export interface StreamNftRecord {
