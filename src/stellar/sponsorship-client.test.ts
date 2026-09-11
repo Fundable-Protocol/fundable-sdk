@@ -9,19 +9,23 @@ function jsonResponse(body: object, status = 200): Response {
   });
 }
 
+function successfulResponse(data: object, status = 200): Response {
+  return jsonResponse({ status: true, data }, status);
+}
+
 describe("StellarSponsorshipClient", () => {
   it("authenticates a wallet and uses the bearer session for sponsorship", async () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        jsonResponse({
+        successfulResponse({
           challenge_id: "challenge-id",
           message: "Sign this Fundable challenge",
           expires_at: "2030-01-01T00:00:00.000Z",
         }),
       )
       .mockResolvedValueOnce(
-        jsonResponse({
+        successfulResponse({
           access_token: "session-token",
           token_type: "Bearer",
           expires_at: "2030-01-01T00:15:00.000Z",
@@ -29,7 +33,7 @@ describe("StellarSponsorshipClient", () => {
         }),
       )
       .mockResolvedValueOnce(
-        jsonResponse({
+        successfulResponse({
           fee_token: "CFEE",
           fee_in_token: "123",
           fee_in_token_ui: "0.0000123",
@@ -66,7 +70,7 @@ describe("StellarSponsorshipClient", () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        jsonResponse({
+        successfulResponse({
           transaction_xdr: "built-xdr",
           user_auth_entry: "auth-entry",
           fee_token: "CFEE",
@@ -79,7 +83,7 @@ describe("StellarSponsorshipClient", () => {
         }),
       )
       .mockResolvedValueOnce(
-        jsonResponse({
+        successfulResponse({
           intentId: "intent-1",
           submissionId: "submission-1",
           status: "pending",
@@ -119,6 +123,26 @@ describe("StellarSponsorshipClient", () => {
         headers: expect.objectContaining({ "Idempotency-Key": "request-1" }),
       }),
     );
+  });
+
+  it("keeps compatibility with unwrapped successful responses", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(
+      jsonResponse({
+        challenge_id: "challenge-id",
+        message: "Sign this Fundable challenge",
+        expires_at: "2030-01-01T00:00:00.000Z",
+      }),
+    );
+    const client = new StellarSponsorshipClient({
+      backendUrl: "https://api.example.com",
+      fetch: fetcher,
+    });
+
+    await expect(client.createChallenge("GACCOUNT", "TESTNET")).resolves.toEqual({
+      challengeId: "challenge-id",
+      message: "Sign this Fundable challenge",
+      expiresAt: "2030-01-01T00:00:00.000Z",
+    });
   });
 
   it("rejects expired builds before calling the backend", async () => {
