@@ -142,6 +142,13 @@ function optionalString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value : null;
 }
 
+function unwrapResponseData(payload: Record<string, any>): Record<string, any> {
+  const data = payload.data;
+  return payload.status === true && data !== null && typeof data === "object" && !Array.isArray(data)
+    ? data
+    : payload;
+}
+
 export class StellarSponsorshipClient {
   private readonly fetcher: typeof fetch;
   private readonly backendUrl: string;
@@ -159,7 +166,7 @@ export class StellarSponsorshipClient {
     this.backendUrl = config.backendUrl.replace(/\/$/, "");
     this.accessToken = config.accessToken;
     this.headers = config.headers ?? {};
-    this.fetcher = config.fetch ?? fetch;
+    this.fetcher = config.fetch ?? ((input, init) => globalThis.fetch(input, init));
   }
 
   setAccessToken(accessToken: string | undefined): void {
@@ -331,6 +338,6 @@ export class StellarSponsorshipClient {
         chain: "stellar",
       });
     }
-    return payload;
+    return unwrapResponseData(payload);
   }
 }

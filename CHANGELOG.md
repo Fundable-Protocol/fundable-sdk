@@ -2,6 +2,14 @@
 
 All notable changes to `@fundable/sdk` are documented here.
 
+## 0.2.1
+
+### Fixed
+
+- parse the Fundable backend's `{ status, data }` success envelope across wallet
+  authentication and sponsorship requests;
+- call the browser's native `fetch` with its required global receiver.
+
 ## 0.2.0
 
 Mainnet-readiness integration release.
