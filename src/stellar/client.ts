@@ -1,4 +1,5 @@
 import { FUNDABLE_ERROR_CODES, FundableError } from "../core/index.js";
+import { normalizeUnsignedAuthorizationEntry } from "./authorization-entry.js";
 import { StellarFlowClient } from "./flow-client.js";
 import { StellarLockupClient } from "./lockup-client.js";
 import { StellarPaymasterClient } from "./paymaster-client.js";
@@ -86,10 +87,13 @@ export class StellarFundableClient {
         chain: "stellar",
       });
     }
-    const result = await this.config.signAuthEntry(build.userAuthEntry, {
-      networkPassphrase: this.config.networkPassphrase,
-      address: this.config.publicKey,
-    });
+    const result = await this.config.signAuthEntry(
+      normalizeUnsignedAuthorizationEntry(build.userAuthEntry),
+      {
+        networkPassphrase: this.config.networkPassphrase,
+        address: this.config.publicKey,
+      },
+    );
     if (result.error || !result.signedAuthEntry) {
       throw new FundableError({
         code: FUNDABLE_ERROR_CODES.TRANSACTION_FAILED,
