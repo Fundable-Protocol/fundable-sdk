@@ -1,6 +1,6 @@
 {
     "name": "@fundable/sdk",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "private": false,
     "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
     "license": "MIT",

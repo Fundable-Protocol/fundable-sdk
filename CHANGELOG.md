@@ -2,6 +2,13 @@
 
 All notable changes to `@fundable/sdk` are documented here.
 
+## 0.2.2
+
+### Added
+
+- a typed Stellar sponsorship intent for exact, backend-validated token
+  approvals used by gasless Lockup funding.
+
 ## 0.2.1
 
 ### Fixed

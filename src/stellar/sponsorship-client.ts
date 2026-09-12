@@ -49,6 +49,14 @@ interface ExistingStreamIntent {
 
 export type StellarSponsorIntent =
   | {
+      operation: "approve";
+      owner: string;
+      token: string;
+      spender: string;
+      amount: string;
+      expiration_ledger: number;
+    }
+  | {
       operation: "create";
       stream_kind: "lockup";
       sender: string;
