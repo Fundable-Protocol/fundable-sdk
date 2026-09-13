@@ -1,10 +1,35 @@
-import { StrKey } from "@stellar/stellar-sdk";
+import { Address, Contract, hash, Keypair, nativeToScVal, StrKey, xdr } from "@stellar/stellar-sdk";
 import { describe, expect, it, vi } from "vitest";
 import { FundableError } from "../core/index.js";
 import { createFundableClient } from "../client.js";
 
 function contractId(): string {
   return StrKey.encodeContract(new Uint8Array(32));
+}
+
+function unsignedAuthorizationEntry(): { entryXdr: string; signer: Keypair } {
+  const signer = Keypair.random();
+  const entryXdr = new xdr.SorobanAuthorizationEntry({
+    credentials: xdr.SorobanCredentials.sorobanCredentialsAddress(
+      new xdr.SorobanAddressCredentials({
+        address: Address.fromString(signer.publicKey()).toScAddress(),
+        nonce: xdr.Int64.fromString("1"),
+        signatureExpirationLedger: 2_000,
+        signature: xdr.ScVal.scvVec([]),
+      }),
+    ),
+    rootInvocation: new xdr.SorobanAuthorizedInvocation({
+      function: xdr.SorobanAuthorizedFunction.sorobanAuthorizedFunctionTypeContractFn(
+        new xdr.InvokeContractArgs({
+          contractAddress: new Contract(contractId()).address().toScAddress(),
+          functionName: "forward",
+          args: [nativeToScVal(signer.publicKey(), { type: "address" })],
+        }),
+      ),
+      subInvocations: [],
+    }),
+  }).toXDR("base64");
+  return { entryXdr, signer };
 }
 
 describe("createFundableClient", () => {
@@ -55,8 +80,11 @@ describe("createFundableClient", () => {
   });
 
   it("signs a current sponsorship build with the configured wallet", async () => {
-    const signAuthEntry = vi.fn(async () => ({
-      signedAuthEntry: "signed-entry",
+    const authorization = unsignedAuthorizationEntry();
+    const signAuthEntry = vi.fn(async (preimageXdr: string) => ({
+      signedAuthEntry: authorization.signer
+        .sign(hash(Buffer.from(preimageXdr, "base64")))
+        .toString("base64"),
       signerAddress: "GACCOUNT",
     }));
     const client = createFundableClient({
@@ -73,10 +101,9 @@ describe("createFundableClient", () => {
       },
     });
 
-    await expect(
-      client.signSponsorshipAuthorization({
+    const result = await client.signSponsorshipAuthorization({
         transactionXdr: "built-xdr",
-        userAuthEntry: "auth-entry",
+        userAuthEntry: authorization.entryXdr,
         feeToken: "CFEE",
         networkFeeStroops: "100",
         estimatedFee: "123",
@@ -84,9 +111,10 @@ describe("createFundableClient", () => {
         maximumFee: "130",
         maximumFeeUi: "0.0000130",
         validUntil: "2030-01-01T00:00:00.000Z",
-      }),
-    ).resolves.toBe("signed-entry");
-    expect(signAuthEntry).toHaveBeenCalledWith("auth-entry", {
+      });
+    const signed = xdr.SorobanAuthorizationEntry.fromXDR(result, "base64");
+    expect(signed.credentials().address().signature().switch().name).toBe("scvVec");
+    expect(signAuthEntry).toHaveBeenCalledWith(expect.any(String), {
       networkPassphrase: "Test SDF Network ; September 2015",
       address: "GACCOUNT",
     });

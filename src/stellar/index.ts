@@ -6,4 +6,3 @@ export * from "./router-client.js";
 export * from "./stream-nft-client.js";
 export * from "./sponsorship-client.js";
 export * from "./types.js";
-export * from "./authorization-entry.js";
