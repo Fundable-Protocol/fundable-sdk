@@ -2,6 +2,18 @@
 
 All notable changes to `@fundable/sdk` are documented here.
 
+## 0.2.2
+
+### Added
+
+- a typed Stellar sponsorship intent for exact, backend-validated token
+  approvals used by gasless Lockup funding.
+
+### Fixed
+
+- sign the Soroban authorization preimage through the wallet and insert the
+  returned signature into the relayer authorization entry before submission.
+
 ## 0.2.1
 
 ### Fixed

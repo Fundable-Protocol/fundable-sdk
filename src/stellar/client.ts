@@ -1,4 +1,5 @@
 import { FUNDABLE_ERROR_CODES, FundableError } from "../core/index.js";
+import { authorizeEntry, xdr } from "@stellar/stellar-sdk";
 import { StellarFlowClient } from "./flow-client.js";
 import { StellarLockupClient } from "./lockup-client.js";
 import { StellarPaymasterClient } from "./paymaster-client.js";
@@ -8,6 +9,11 @@ import { StellarSponsorshipClient } from "./sponsorship-client.js";
 import type { StellarSponsorBuild } from "./sponsorship-client.js";
 import type { StellarFundableClientConfig } from "./types.js";
 import { assertContractId } from "./validation.js";
+
+function base64ToBytes(value: string): Uint8Array {
+  const binary = atob(value);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
 
 export class StellarFundableClient {
   readonly chain = "stellar" as const;
@@ -86,17 +92,31 @@ export class StellarFundableClient {
         chain: "stellar",
       });
     }
-    const result = await this.config.signAuthEntry(build.userAuthEntry, {
-      networkPassphrase: this.config.networkPassphrase,
-      address: this.config.publicKey,
-    });
-    if (result.error || !result.signedAuthEntry) {
-      throw new FundableError({
-        code: FUNDABLE_ERROR_CODES.TRANSACTION_FAILED,
-        message: result.error?.message ?? "The wallet did not sign the authorization entry.",
-        chain: "stellar",
-      });
-    }
-    return result.signedAuthEntry;
+    const entry = xdr.SorobanAuthorizationEntry.fromXDR(
+      build.userAuthEntry,
+      "base64",
+    );
+    const expirationLedger = entry.credentials().address().signatureExpirationLedger();
+    const signedEntry = await authorizeEntry(
+      entry,
+      async (preimage) => {
+        const result = await this.config.signAuthEntry!(preimage.toXDR("base64"), {
+          networkPassphrase: this.config.networkPassphrase,
+          address: this.config.publicKey,
+        });
+        if (result.error || !result.signedAuthEntry) {
+          throw new FundableError({
+            code: FUNDABLE_ERROR_CODES.TRANSACTION_FAILED,
+            message:
+              result.error?.message ?? "The wallet did not sign the authorization entry.",
+            chain: "stellar",
+          });
+        }
+        return base64ToBytes(result.signedAuthEntry);
+      },
+      expirationLedger,
+      this.config.networkPassphrase,
+    );
+    return signedEntry.toXDR("base64");
   }
 }
