@@ -181,4 +181,101 @@ describe("StellarSponsorshipClient", () => {
     });
     expect(fetcher).not.toHaveBeenCalled();
   });
+
+  it("executes the complete sponsored Router Lockup creation flow", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      // 1. Challenge
+      .mockResolvedValueOnce(
+        successfulResponse({
+          challenge_id: "challenge-123",
+          message: "Sign this Fundable challenge",
+          expires_at: "2030-01-01T00:00:00.000Z",
+        }),
+      )
+      // 2. Session verify
+      .mockResolvedValueOnce(
+        successfulResponse({
+          access_token: "session-abc",
+          token_type: "Bearer",
+          expires_at: "2030-01-01T00:15:00.000Z",
+          wallet: { address: "GUSER", network: "TESTNET" },
+        }),
+      )
+      // 3. Quote
+      .mockResolvedValueOnce(
+        successfulResponse({
+          fee_token: "CFEE",
+          fee_in_token: "5000000",
+          fee_in_token_ui: "0.5",
+          conversion_rate: "1",
+          max_fee_in_token: "5500000",
+          max_fee_in_token_ui: "0.55",
+        }),
+      )
+      // 4. Build
+      .mockResolvedValueOnce(
+        successfulResponse({
+          transaction_xdr: "sponsored-tx-xdr",
+          user_auth_entry: "raw-auth-entry-xdr",
+          fee_token: "CFEE",
+          fee_in_stroops: "100",
+          fee_in_token: "5000000",
+          fee_in_token_ui: "0.5",
+          max_fee_in_token: "5500000",
+          max_fee_in_token_ui: "0.55",
+          valid_until: "2030-01-01T00:00:00.000Z",
+        }),
+      )
+      // 5. Submit
+      .mockResolvedValueOnce(
+        successfulResponse({
+          intentId: "intent-router-lockup-1",
+          submissionId: "submission-99",
+          status: "pending",
+          relayerTransactionId: "relayer-tx-88",
+          transactionHash: "tx-hash-lockup-router",
+          streamId: "101",
+          reused: false,
+        }),
+      );
+
+    const client = new StellarSponsorshipClient({
+      backendUrl: "https://api.example.com",
+      fetch: fetcher,
+    });
+
+    const session = await client.authenticate(
+      "GUSER",
+      "TESTNET",
+      async () => "wallet-sig",
+    );
+    expect(session.accessToken).toBe("session-abc");
+
+    const unsignedRouterLockupXdr = "AAAA...unsigned-router-lockup-xdr...";
+    const quote = await client.quote(unsignedRouterLockupXdr, "TESTNET");
+    expect(quote.maximumFeeUi).toBe("0.55");
+
+    const build = await client.build(unsignedRouterLockupXdr, "TESTNET");
+    expect(build.userAuthEntry).toBe("raw-auth-entry-xdr");
+
+    // Sign user auth entry
+    const signedAuthEntry = "AAAA...signed-user-auth-entry...";
+    const submission = await client.submit({
+      build,
+      signedAuthEntry,
+      network: "TESTNET",
+      intent: {
+        operation: "create_lockup",
+        contract: "CROUTER",
+        sender: "GUSER",
+      },
+      idempotencyKey: "lockup-create-key-1",
+    });
+
+    expect(submission.streamTokenId).toBe("101");
+    expect(submission.transactionHash).toBe("tx-hash-lockup-router");
+    expect(submission.status).toBe("pending");
+  });
 });
+

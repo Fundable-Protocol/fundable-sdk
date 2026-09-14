@@ -2,7 +2,6 @@ import type { AssembledTransaction } from "@stellar/stellar-sdk/contract";
 import {
   CHAIN_FAMILIES,
   FLOW_STATUSES,
-  toFundableError,
   toUnixSeconds,
   type AdjustFlowRateInput,
   type CreateAndDepositFlowInput,
@@ -14,6 +13,7 @@ import {
   type RestartFlowInput,
   type WithdrawFlowInput,
 } from "../core/index.js";
+import { toFundableError } from "./error-parser.js";
 import {
   Client as GeneratedFlowClient,
   StreamStatus as GeneratedStreamStatus,
@@ -59,17 +59,21 @@ export class StellarFlowClient {
     options?: StellarMethodOptions,
   ): Promise<StellarTransaction<bigint>> {
     this.validateCreateInput(input);
-    return this.client.create(
-      {
-        sender: input.sender,
-        recipient: input.recipient,
-        token: input.token.address,
-        rate_per_second: input.ratePerSecond,
-        token_decimals: input.token.decimals,
-        start_time: toUnixSeconds(input.startTime),
-      },
-      options,
-    );
+    try {
+      return await this.client.create(
+        {
+          sender: input.sender,
+          recipient: input.recipient,
+          token: input.token.address,
+          rate_per_second: input.ratePerSecond,
+          token_decimals: input.token.decimals,
+          start_time: toUnixSeconds(input.startTime),
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to create Flow stream.");
+    }
   }
 
   async createAndDeposit(
@@ -78,18 +82,22 @@ export class StellarFlowClient {
   ): Promise<StellarTransaction<bigint>> {
     this.validateCreateInput(input);
     assertPositive(input.amount, "Deposit amount");
-    return this.client.create_and_deposit(
-      {
-        sender: input.sender,
-        recipient: input.recipient,
-        token: input.token.address,
-        rate_per_second: input.ratePerSecond,
-        token_decimals: input.token.decimals,
-        start_time: toUnixSeconds(input.startTime),
-        amount: input.amount,
-      },
-      options,
-    );
+    try {
+      return await this.client.create_and_deposit(
+        {
+          sender: input.sender,
+          recipient: input.recipient,
+          token: input.token.address,
+          rate_per_second: input.ratePerSecond,
+          token_decimals: input.token.decimals,
+          start_time: toUnixSeconds(input.startTime),
+          amount: input.amount,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to create and deposit Flow stream.");
+    }
   }
 
   async deposit(
@@ -98,14 +106,18 @@ export class StellarFlowClient {
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.funder, "Funder");
     assertPositive(input.amount, "Deposit amount");
-    return this.client.deposit(
-      {
-        stream_id: toStreamId(input.streamId),
-        funder: input.funder,
-        amount: input.amount,
-      },
-      options,
-    );
+    try {
+      return await this.client.deposit(
+        {
+          stream_id: toStreamId(input.streamId),
+          funder: input.funder,
+          amount: input.amount,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to deposit into Flow stream.");
+    }
   }
 
   async withdraw(
@@ -115,15 +127,19 @@ export class StellarFlowClient {
     assertStellarAddress(input.caller, "Caller");
     assertStellarAddress(input.to, "Withdrawal destination");
     assertPositive(input.amount, "Withdrawal amount");
-    return this.client.withdraw(
-      {
-        stream_id: toStreamId(input.streamId),
-        caller: input.caller,
-        to: input.to,
-        amount: input.amount,
-      },
-      options,
-    );
+    try {
+      return await this.client.withdraw(
+        {
+          stream_id: toStreamId(input.streamId),
+          caller: input.caller,
+          to: input.to,
+          amount: input.amount,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to withdraw from Flow stream.");
+    }
   }
 
   async withdrawMax(
@@ -132,14 +148,18 @@ export class StellarFlowClient {
   ): Promise<StellarTransaction<bigint>> {
     assertStellarAddress(input.actor, "Caller");
     assertStellarAddress(input.to, "Withdrawal destination");
-    return this.client.withdraw_max(
-      {
-        stream_id: toStreamId(input.streamId),
-        caller: input.actor,
-        to: input.to,
-      },
-      options,
-    );
+    try {
+      return await this.client.withdraw_max(
+        {
+          stream_id: toStreamId(input.streamId),
+          caller: input.actor,
+          to: input.to,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to withdraw maximum from Flow stream.");
+    }
   }
 
   async pause(
@@ -147,13 +167,17 @@ export class StellarFlowClient {
     options?: StellarMethodOptions,
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.actor, "Sender");
-    return this.client.pause(
-      {
-        stream_id: toStreamId(input.streamId),
-        sender: input.actor,
-      },
-      options,
-    );
+    try {
+      return await this.client.pause(
+        {
+          stream_id: toStreamId(input.streamId),
+          sender: input.actor,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to pause Flow stream.");
+    }
   }
 
   async restart(
@@ -162,14 +186,18 @@ export class StellarFlowClient {
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.actor, "Sender");
     assertPositive(input.ratePerSecond, "Rate per second");
-    return this.client.restart(
-      {
-        stream_id: toStreamId(input.streamId),
-        sender: input.actor,
-        rate_per_second: input.ratePerSecond,
-      },
-      options,
-    );
+    try {
+      return await this.client.restart(
+        {
+          stream_id: toStreamId(input.streamId),
+          sender: input.actor,
+          rate_per_second: input.ratePerSecond,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to restart Flow stream.");
+    }
   }
 
   async adjustRate(
@@ -178,14 +206,18 @@ export class StellarFlowClient {
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.actor, "Sender");
     assertPositive(input.ratePerSecond, "Rate per second");
-    return this.client.adjust_rate(
-      {
-        stream_id: toStreamId(input.streamId),
-        sender: input.actor,
-        new_rate: input.ratePerSecond,
-      },
-      options,
-    );
+    try {
+      return await this.client.adjust_rate(
+        {
+          stream_id: toStreamId(input.streamId),
+          sender: input.actor,
+          new_rate: input.ratePerSecond,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to adjust Flow rate.");
+    }
   }
 
   async refund(
@@ -194,14 +226,18 @@ export class StellarFlowClient {
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.actor, "Sender");
     assertPositive(input.amount, "Refund amount");
-    return this.client.refund(
-      {
-        stream_id: toStreamId(input.streamId),
-        sender: input.actor,
-        amount: input.amount,
-      },
-      options,
-    );
+    try {
+      return await this.client.refund(
+        {
+          stream_id: toStreamId(input.streamId),
+          sender: input.actor,
+          amount: input.amount,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to refund Flow stream.");
+    }
   }
 
   async refundMax(
@@ -209,13 +245,17 @@ export class StellarFlowClient {
     options?: StellarMethodOptions,
   ): Promise<StellarTransaction<bigint>> {
     assertStellarAddress(input.actor, "Sender");
-    return this.client.refund_max(
-      {
-        stream_id: toStreamId(input.streamId),
-        sender: input.actor,
-      },
-      options,
-    );
+    try {
+      return await this.client.refund_max(
+        {
+          stream_id: toStreamId(input.streamId),
+          sender: input.actor,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to refund maximum from Flow stream.");
+    }
   }
 
   async void(
@@ -223,14 +263,33 @@ export class StellarFlowClient {
     options?: StellarMethodOptions,
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.actor, "Caller");
-    return this.client.void_stream(
-      {
-        stream_id: toStreamId(input.streamId),
-        caller: input.actor,
-      },
-      options,
-    );
+    try {
+      return await this.client.void_stream(
+        {
+          stream_id: toStreamId(input.streamId),
+          caller: input.actor,
+        },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to void Flow stream.");
+    }
   }
+
+  async extendStreamTtl(
+    streamId: string | bigint,
+    options?: StellarMethodOptions,
+  ): Promise<StellarTransaction<null>> {
+    try {
+      return await this.client.extend_stream_ttl(
+        { stream_id: toStreamId(streamId) },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to extend Flow stream TTL.");
+    }
+  }
+
 
   async getStream(streamId: string | bigint): Promise<FlowRecord> {
     const id = toStreamId(streamId);

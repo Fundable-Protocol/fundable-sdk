@@ -88,3 +88,34 @@ Reproducible WASM SHA-256 values:
 The SDK `0.2.0` bindings were generated from the four reproducible release
 artifacts with the corresponding `pnpm generate:* -- /absolute/path.wasm`
 commands. The transitional Paymaster was intentionally not regenerated.
+
+## Hardened contract release provenance (SDK v0.2.3)
+
+- Contract verification: `make build` and `cargo test` (98 tests passed)
+- Stellar CLI: `stellar 22.0.2`
+
+Optimized WASM SHA-256 values:
+
+| Contract | SHA-256 |
+| --- | --- |
+| Flow | `3903d1dee59ef048a64d5287bb9e27e05d54c3c8dc3962e28c16b2031d074906` |
+| Lockup | `e752e3589144c340136c0fa6a1ab344dd794ad547d3fe0bebcce7c1f995b59fc` |
+| Router | `36e881b771aa6f64bb0d96915e61e6d65a0f976bce332b4b73102ac8d228c4c9` |
+| Stream NFT | `61ec4bfa817780d65ed439b01dc39d703162c6801346427df7a05d4256f94726` |
+| Paymaster | `b068fcfa6103a2686997939d1942629c9f97ce941df85109fd0181f4622e9195` |
+
+The bindings were regenerated with `scripts/generate-stellar-binding.mjs` for all five contracts:
+- `pnpm generate:flow -- /path/to/flow.wasm`
+- `pnpm generate:lockup -- /path/to/lockup.wasm`
+- `pnpm generate:router -- /path/to/router.wasm`
+- `pnpm generate:stream-nft -- /path/to/stream_nft.wasm`
+- `pnpm generate:paymaster -- /path/to/paymaster.wasm`
+
+Key contract changes reflected in SDK v0.2.3:
+- Contract initialization (`initialize`) methods require explicit `admin` authorization.
+- Two-step administrative transfers: `propose_admin` followed by `accept_admin`.
+- Timelocked contract upgrades: `propose_upgrade` followed by `execute_upgrade` (or direct `upgrade` for immediate upgrades).
+- Stream TTL extension: `extend_stream_ttl`.
+- Router delegates NFT ownership and stream indexing to the Stream NFT contract; `create_flow_stream` and `create_lockup_stream` cleanly handle routing without redundant caller parameters.
+- Comprehensive contract error coverage mapped: Flow 1–28, Lockup 101–120, Stream NFT 201–205, Router 301–305, Paymaster 401–408.
+

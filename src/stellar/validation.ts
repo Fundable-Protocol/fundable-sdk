@@ -84,3 +84,58 @@ export function assertTokenDecimals(value: number, label = "Token decimals"): vo
     });
   }
 }
+
+export const I128_MAX = (1n << 127n) - 1n;
+
+export function assertLockupUnlockAmounts(
+  startUnlockAmount: bigint,
+  cliffUnlockAmount: bigint,
+  totalAmount: bigint,
+): void {
+  if (startUnlockAmount < 0n) {
+    throw new FundableError({
+      code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
+      message: "Start unlock amount cannot be negative.",
+      chain: "stellar",
+    });
+  }
+  if (cliffUnlockAmount < 0n) {
+    throw new FundableError({
+      code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
+      message: "Cliff unlock amount cannot be negative.",
+      chain: "stellar",
+    });
+  }
+
+  const unlockSum = startUnlockAmount + cliffUnlockAmount;
+  if (unlockSum > I128_MAX) {
+    throw new FundableError({
+      code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
+      message: "Unlock amounts sum overflowed maximum supported integer capacity.",
+      chain: "stellar",
+    });
+  }
+
+  if (unlockSum > totalAmount) {
+    throw new FundableError({
+      code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
+      message: `Unlock amounts sum (${unlockSum.toString()}) cannot exceed total stream amount (${totalAmount.toString()}).`,
+      chain: "stellar",
+    });
+  }
+}
+
+export function assertTokenDecimalsMatch(
+  suppliedDecimals: number,
+  contractDecimals: number,
+  tokenLabel = "Token",
+): void {
+  if (suppliedDecimals !== contractDecimals) {
+    throw new FundableError({
+      code: FUNDABLE_ERROR_CODES.INVALID_ARGUMENT,
+      message: `Token decimals mismatch: caller supplied ${suppliedDecimals} decimals, but ${tokenLabel} contract specifies ${contractDecimals} decimals.`,
+      chain: "stellar",
+    });
+  }
+}
+

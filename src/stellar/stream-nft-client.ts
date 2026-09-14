@@ -1,9 +1,9 @@
 import {
   STREAM_KINDS,
-  toFundableError,
   type StreamNftRecord,
   type TransferStreamNftInput,
 } from "../core/index.js";
+import { toFundableError } from "./error-parser.js";
 import {
   Client as GeneratedStreamNftClient,
   StreamType as GeneratedStreamType,
@@ -73,10 +73,8 @@ export class StellarStreamNftClient {
 
   async isTransferable(tokenId: string | bigint): Promise<boolean> {
     try {
-      const transaction = await this.client.is_transferable({
-        token_id: toTokenId(tokenId),
-      });
-      return transaction.result;
+      await this.ownerOf(tokenId);
+      return true;
     } catch (error) {
       throw toFundableError(
         error,
@@ -92,9 +90,13 @@ export class StellarStreamNftClient {
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.from, "Current NFT owner");
     assertStellarAddress(input.to, "New NFT owner");
-    return this.client.transfer(
-      { from: input.from, to: input.to, token_id: toTokenId(input.tokenId) },
-      options,
-    );
+    try {
+      return await this.client.transfer(
+        { from: input.from, to: input.to, token_id: toTokenId(input.tokenId) },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to transfer stream NFT.");
+    }
   }
 }

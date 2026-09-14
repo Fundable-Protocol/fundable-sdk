@@ -1,4 +1,5 @@
 import { FUNDABLE_ERROR_CODES, FundableError } from "../core/index.js";
+import { StellarAdminClient } from "./admin-client.js";
 import { StellarFlowClient } from "./flow-client.js";
 import { StellarLockupClient } from "./lockup-client.js";
 import { StellarPaymasterClient } from "./paymaster-client.js";
@@ -18,6 +19,7 @@ export class StellarFundableClient {
   /** @deprecated Production integrations must use `sponsorship`. */
   readonly paymaster?: StellarPaymasterClient;
   readonly sponsorship?: StellarSponsorshipClient;
+  readonly admin: StellarAdminClient;
 
   constructor(readonly config: StellarFundableClientConfig) {
     if (!config.rpcUrl || !config.networkPassphrase) {
@@ -62,6 +64,7 @@ export class StellarFundableClient {
     if (config.sponsorship) {
       this.sponsorship = new StellarSponsorshipClient(config.sponsorship);
     }
+    this.admin = new StellarAdminClient(config);
   }
 
   async signSponsorshipAuthorization(build: StellarSponsorBuild): Promise<string> {
