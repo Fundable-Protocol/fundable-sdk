@@ -1,9 +1,9 @@
 import {
   LOCKUP_STATUSES,
-  toFundableError,
   type LockupActorInput,
   type LockupStatus,
 } from "../core/index.js";
+import { toFundableError } from "./error-parser.js";
 import {
   Client as GeneratedLockupClient,
   LockupStatus as GeneratedLockupStatus,
@@ -46,10 +46,14 @@ export class StellarLockupClient {
     options?: StellarMethodOptions,
   ): Promise<StellarTransaction<bigint>> {
     assertStellarAddress(input.sender, "Lockup sender");
-    return this.client.cancel(
-      { stream_id: toStreamId(input.streamId), sender: input.sender },
-      options,
-    );
+    try {
+      return await this.client.cancel(
+        { stream_id: toStreamId(input.streamId), sender: input.sender },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to cancel Lockup stream.");
+    }
   }
 
   async renounce(
@@ -57,10 +61,28 @@ export class StellarLockupClient {
     options?: StellarMethodOptions,
   ): Promise<StellarTransaction<null>> {
     assertStellarAddress(input.sender, "Lockup sender");
-    return this.client.renounce(
-      { stream_id: toStreamId(input.streamId), sender: input.sender },
-      options,
-    );
+    try {
+      return await this.client.renounce(
+        { stream_id: toStreamId(input.streamId), sender: input.sender },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to renounce Lockup stream.");
+    }
+  }
+
+  async extendStreamTtl(
+    streamId: string | bigint,
+    options?: StellarMethodOptions,
+  ): Promise<StellarTransaction<null>> {
+    try {
+      return await this.client.extend_stream_ttl(
+        { stream_id: toStreamId(streamId) },
+        options,
+      );
+    } catch (error) {
+      throw toFundableError(error, "Failed to extend Lockup stream TTL.");
+    }
   }
 
   async statusOf(streamId: string | bigint): Promise<LockupStatus> {

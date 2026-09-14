@@ -1,5 +1,5 @@
 /** Fundable Protocol multichain SDK. Stellar is the first implemented adapter. */
-export const VERSION = "0.2.0";
+export const VERSION = "0.2.3";
 
 export * from "./client.js";
 export * from "./core/index.js";

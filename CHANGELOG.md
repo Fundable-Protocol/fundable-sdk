@@ -2,6 +2,27 @@
 
 All notable changes to `@fundable/sdk` are documented here.
 
+## 0.2.3
+
+Hardened Soroban contract alignment release.
+
+### Added
+
+- Administrative and maintenance clients on `client.admin` (`StellarAdminClient`, `FlowAdminClient`, `LockupAdminClient`, `RouterAdminClient`) exposing:
+  - `proposeUpgrade`, `executeUpgrade`, and direct `upgrade`
+  - Two-step admin transfers: `proposeAdmin`, `acceptAdmin`
+  - Stream TTL extension: `extendStreamTtl`
+  - Router NFT upgrades: `upgradeNft`
+- Comprehensive Soroban error mappings covering Flow 1–28 (e.g. `TokenTransferMismatch`, `TokenDecimalsMismatch`, `ArithmeticError`), Lockup 101–120 (including corrected 111 `NegativeUnlockAmount`, `StartUnlockAmountExceedsTotal`, `GranularityZero`), Stream NFT 201–205, Router 301–305 (`InvalidContractAddress`), Paymaster 401–408.
+- Client-side validations for Lockup unlock amounts (`assertLockupUnlockAmounts`) and token decimals (`assertTokenDecimalsMatch`).
+- Stream NFT delegated queries for Router stream metadata and status.
+
+### Changed
+
+- Regenerated TypeScript contract bindings for Flow, Lockup, Router, Stream NFT, and Paymaster from hardened contract WASM builds.
+- Router `createFlow` and `createLockup` aligned with hardened contract interface, delegating stream token minting and indexing to the Stream NFT contract.
+- Re-exported error parsing and Soroban error definitions (`SOROBAN_CONTRACT_ERRORS`, `parseSorobanErrorCode`, `translateSorobanError`, `toStellarFundableError`).
+
 ## 0.2.1
 
 ### Fixed

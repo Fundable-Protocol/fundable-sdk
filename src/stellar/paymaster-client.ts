@@ -1,9 +1,9 @@
 import {
   FUNDABLE_ERROR_CODES,
   FundableError,
-  toFundableError,
   type PaymasterForwardInput,
 } from "../core/index.js";
+import { toFundableError } from "./error-parser.js";
 import { Client as GeneratedPaymasterClient } from "../generated/paymaster/src/index.js";
 import type { StellarFundableClientConfig, StellarMethodOptions } from "./types.js";
 import type { StellarTransaction } from "./flow-client.js";
