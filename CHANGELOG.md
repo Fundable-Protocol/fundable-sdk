@@ -2,6 +2,28 @@
 
 All notable changes to `@fundable/sdk` are documented here.
 
+## 0.3.0
+
+Stellar Merkle Token Distributor and Claim release.
+
+### Added
+
+- `StellarDistributorClient` on `client.distributor` exposing:
+  - `createDistribution`: create on-chain Merkle distributions with token, root, total amount, leaf count, and metadata.
+  - `claim`: claim distributed tokens using cryptographic Merkle proofs.
+  - `getDistribution`: query distribution details including creator, token, merkle root, total amount, claimed amount, and metadata.
+  - `isClaimed`: verify if a claimant has claimed tokens from a distribution.
+  - `getClaimedCount`: retrieve total number of claims made for a distribution.
+  - `getDistributionCount`: retrieve total distributions created on the contract.
+  - `getFeePercent`, `getFeeAddress`: query contract protocol fee configuration.
+- Cryptographic Merkle tree utilities in `@fundable/sdk/stellar`:
+  - `computeSorobanLeaf`: calculates Keccak-256 leaf hash for `(claimant, amount)` matching Soroban ScVal XDR encoding.
+  - `MerkleTree`: lightweight tree implementation supporting root calculation, proof generation, and verification with sorted-pair hashing.
+  - `generateDistributionMerkleTree`: helper for batching distribution claims into tree structure, total amount, and root.
+- Generated TypeScript bindings for Distributor Soroban contract (`src/generated/distributor/src/index.ts`).
+- Complete Distributor error mapping (501–517) in `SOROBAN_CONTRACT_ERRORS`.
+- Live Testnet integration tests and runnable example scripts (`example:create-distribution`, `example:claim-distribution`).
+
 ## 0.2.3
 
 Hardened Soroban contract alignment release.

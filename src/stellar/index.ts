@@ -1,5 +1,7 @@
 export * from "./admin-client.js";
 export * from "./client.js";
+export * from "./distributor-client.js";
+export * from "./merkle.js";
 export {
   SOROBAN_CONTRACT_ERRORS,
   parseSorobanErrorCode,

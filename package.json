@@ -1,6 +1,6 @@
 {
     "name": "@fundable/sdk",
-    "version": "0.2.3",
+    "version": "0.3.0",
     "private": false,
     "description": "Multichain TypeScript SDK for Fundable Protocol; Stellar adapter included",
     "license": "MIT",
@@ -50,6 +50,7 @@
         "generate:router": "node scripts/generate-stellar-binding.mjs router",
         "generate:stream-nft": "node scripts/generate-stellar-binding.mjs stream_nft",
         "generate:paymaster": "node scripts/generate-stellar-binding.mjs paymaster",
+        "generate:distributor": "node scripts/generate-stellar-binding.mjs distributor",
         "test": "vitest run",
         "test:testnet": "FUNDABLE_TESTNET_INTEGRATION=1 vitest run src/stellar/testnet.integration.test.ts",
         "typecheck": "tsc --noEmit",
@@ -61,6 +62,8 @@
         "example:withdraw-router": "pnpm build && tsx examples/withdraw-router.ts",
         "example:read-stream-nft": "pnpm build && tsx examples/read-stream-nft.ts",
         "example:check-paymaster": "pnpm build && tsx examples/check-paymaster.ts",
+        "example:create-distribution": "pnpm build && tsx examples/create-distribution.ts",
+        "example:claim-distribution": "pnpm build && tsx examples/claim-distribution.ts",
         "package:verify": "node scripts/verify-packed-package.mjs",
         "verify": "pnpm test && pnpm typecheck && pnpm examples:typecheck && pnpm docs:check",
         "prepack": "pnpm verify"
@@ -70,6 +73,7 @@
     },
     "packageManager": "pnpm@10.18.0",
     "dependencies": {
+        "@noble/hashes": "^2.4.0",
         "@stellar/stellar-sdk": "^14.4.3",
         "buffer": "^6.0.3"
     },

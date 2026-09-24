@@ -19,6 +19,7 @@ import type { StellarFundableClientConfig } from "@fundable/sdk/stellar";
 | `lockups` | Present when `contracts.lockup` is configured. |
 | `router` | Present when `contracts.router` is configured. |
 | `streamNft` | Present when `contracts.streamNft` is configured. |
+| `distributor` | Present when `contracts.distributor` is configured. |
 | `sponsorship` | Present when `sponsorship.backendUrl` is configured. |
 | `paymaster` | Deprecated; migration-only when `contracts.paymaster` is configured. |
 
@@ -63,6 +64,19 @@ import type { StellarFundableClientConfig } from "@fundable/sdk/stellar";
 | `getStreamData` | `{ tokenId, streamId, streamKind }`. |
 | `isTransferable` | Immutable on-chain transfer policy. |
 | `transfer` | Assembled transfer transaction. |
+
+## Distributor client
+
+| Method | Result |
+| --- | --- |
+| `createDistribution` | Assembled transaction creating a Merkle token distribution. |
+| `claim` | Assembled transaction claiming tokens using a Merkle proof. |
+| `getDistribution` | Distribution metadata, token, creator, merkleRoot, leafCount, totalAmount, etc. |
+| `isClaimed` | `boolean` indicating if a claimant has claimed from a distribution. |
+| `getClaimedCount` | Total number of claims completed for a distribution as `bigint`. |
+| `getDistributionCount` | Total distributions created on the contract as `bigint`. |
+| `getFeePercent` | Contract protocol fee basis points as `bigint`. |
+| `getFeeAddress` | Protocol fee recipient address. |
 
 ## Sponsorship client
 

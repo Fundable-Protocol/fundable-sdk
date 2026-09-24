@@ -23,6 +23,9 @@ const deployment = {
   streamNft:
     process.env.FUNDABLE_TESTNET_STREAM_NFT ??
     "CCYMOIEL3ID55C4DFQAGZEGJT4KEXM5OHIRJROZRLTLAO3EMSSHJIGLY",
+  distributor:
+    process.env.FUNDABLE_TESTNET_DISTRIBUTOR ??
+    "CA5NDB4GKNIQDVUBJRUNRLZ45KRGFZ2BCALGW6VFDANDTKNRGEKNJRMQ",
   tokenId: process.env.FUNDABLE_TESTNET_STREAM_TOKEN_ID ?? "1",
 };
 
@@ -40,6 +43,7 @@ describe.runIf(runIntegration)("Fundable mainnet-readiness testnet deployment", 
       lockup: deployment.lockup,
       router: deployment.router,
       streamNft: deployment.streamNft,
+      distributor: deployment.distributor,
     },
   });
 
@@ -68,6 +72,13 @@ describe.runIf(runIntegration)("Fundable mainnet-readiness testnet deployment", 
     const coreStreamId = await client.router?.coreStreamId(deployment.tokenId);
     await expect(client.lockups?.statusOf(coreStreamId!)).resolves.toMatch(
       /^(pending|streaming|settled|canceled|depleted)$/,
+    );
+  });
+
+  it("reads Distributor on-chain configuration", async () => {
+    await expect(client.distributor?.getProtocolFeePercent()).resolves.toBe(25);
+    await expect(client.distributor?.getProtocolFeeAddress()).resolves.toBe(
+      deployment.admin,
     );
   });
 });

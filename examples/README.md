@@ -15,6 +15,7 @@ export FUNDABLE_FLOW_CONTRACT="C..."
 export FUNDABLE_ROUTER_CONTRACT="C..."
 export FUNDABLE_STREAM_NFT_CONTRACT="C..."
 export FUNDABLE_PAYMASTER_CONTRACT="C..."
+export FUNDABLE_DISTRIBUTOR_CONTRACT="C..."
 export FUNDABLE_PUBLIC_KEY="G..."
 export FUNDABLE_RECIPIENT="G..."
 export FUNDABLE_TOKEN_CONTRACT="C..."
@@ -35,6 +36,8 @@ pnpm example:create-router-lockup
 pnpm example:withdraw-router
 pnpm example:read-stream-nft
 pnpm example:check-paymaster
+pnpm example:create-distribution
+pnpm example:claim-distribution
 ```
 
 The package is built before each command so Node resolves `@fundable/sdk`

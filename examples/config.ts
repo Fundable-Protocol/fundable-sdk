@@ -5,7 +5,7 @@ import {
 
 const TESTNET_PASSPHRASE = "Test SDF Network ; September 2015";
 
-type Capability = "router" | "streamNft" | "paymaster";
+type Capability = "router" | "streamNft" | "paymaster" | "distributor";
 
 export function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -31,6 +31,7 @@ export function createExampleClient(options?: {
   const router = optionalEnv("FUNDABLE_ROUTER_CONTRACT");
   const streamNft = optionalEnv("FUNDABLE_STREAM_NFT_CONTRACT");
   const paymaster = optionalEnv("FUNDABLE_PAYMASTER_CONTRACT");
+  const distributor = optionalEnv("FUNDABLE_DISTRIBUTOR_CONTRACT");
 
   const requiredAddress =
     options?.capability === "router"
@@ -39,13 +40,16 @@ export function createExampleClient(options?: {
         ? streamNft
         : options?.capability === "paymaster"
           ? paymaster
-          : undefined;
+          : options?.capability === "distributor"
+            ? distributor
+            : undefined;
 
   if (options?.capability && !requiredAddress) {
     const environmentName = {
       router: "FUNDABLE_ROUTER_CONTRACT",
       streamNft: "FUNDABLE_STREAM_NFT_CONTRACT",
       paymaster: "FUNDABLE_PAYMASTER_CONTRACT",
+      distributor: "FUNDABLE_DISTRIBUTOR_CONTRACT",
     }[options.capability];
     throw new Error(`Missing required environment variable: ${environmentName}`);
   }
@@ -64,6 +68,7 @@ export function createExampleClient(options?: {
       router,
       streamNft,
       paymaster,
+      distributor,
     },
   });
 }

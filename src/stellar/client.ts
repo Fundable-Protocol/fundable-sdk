@@ -1,5 +1,6 @@
 import { FUNDABLE_ERROR_CODES, FundableError } from "../core/index.js";
 import { StellarAdminClient } from "./admin-client.js";
+import { StellarDistributorClient } from "./distributor-client.js";
 import { StellarFlowClient } from "./flow-client.js";
 import { StellarLockupClient } from "./lockup-client.js";
 import { StellarPaymasterClient } from "./paymaster-client.js";
@@ -16,6 +17,7 @@ export class StellarFundableClient {
   readonly lockups?: StellarLockupClient;
   readonly router?: StellarRouterClient;
   readonly streamNft?: StellarStreamNftClient;
+  readonly distributor?: StellarDistributorClient;
   /** @deprecated Production integrations must use `sponsorship`. */
   readonly paymaster?: StellarPaymasterClient;
   readonly sponsorship?: StellarSponsorshipClient;
@@ -37,6 +39,14 @@ export class StellarFundableClient {
       this.lockups = new StellarLockupClient({
         ...config,
         contracts: { ...config.contracts, lockup: config.contracts.lockup },
+      });
+    }
+
+    if (config.contracts.distributor) {
+      assertContractId(config.contracts.distributor, "Distributor contract");
+      this.distributor = new StellarDistributorClient({
+        ...config,
+        contracts: { ...config.contracts, distributor: config.contracts.distributor },
       });
     }
 

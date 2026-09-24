@@ -119,3 +119,21 @@ Key contract changes reflected in SDK v0.2.3:
 - Router delegates NFT ownership and stream indexing to the Stream NFT contract; `create_flow_stream` and `create_lockup_stream` cleanly handle routing without redundant caller parameters.
 - Comprehensive contract error coverage mapped: Flow 1–28, Lockup 101–120, Stream NFT 201–205, Router 301–305, Paymaster 401–408.
 
+## Merkle Distributor release provenance (SDK v0.3.0)
+
+- Contract verification: `cargo test -p distributor`
+- Stellar CLI: `stellar 22.0.2`
+- Optimized WASM SHA-256: `ced5060f22ff35516498a0fb0bdce3348626e37c6314fb1fe13604c2ca22271b`
+- Testnet Contract ID: `CA5NDB4GKNIQDVUBJRUNRLZ45KRGFZ2BCALGW6VFDANDTKNRGEKNJRMQ`
+
+The binding was generated with:
+
+```bash
+pnpm generate:distributor -- /path/to/distributor.wasm
+```
+
+Key contract changes reflected in SDK v0.3.0:
+- Merkle Distributor client (`fundable.distributor`) supporting `createDistribution`, `claim`, `getDistribution`, `isClaimed`, `getClaimedCount`, `getDistributionCount`, `getFeePercent`, and `getFeeAddress`.
+- Cryptographic utilities (`generateDistributionMerkleTree`, `computeSorobanLeaf`, `MerkleTree`) with Keccak-256 sorted-pair hashing and Soroban XDR ScVal serialization.
+- Distributor contract error coverage mapped: 501–517.
+

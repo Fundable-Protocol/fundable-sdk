@@ -15,6 +15,7 @@ const fundable = createFundableClient({
     flow: process.env.FUNDABLE_FLOW_CONTRACT!,
     router: process.env.FUNDABLE_ROUTER_CONTRACT,
     streamNft: process.env.FUNDABLE_STREAM_NFT_CONTRACT,
+    distributor: process.env.FUNDABLE_DISTRIBUTOR_CONTRACT,
   },
   sponsorship: { backendUrl: process.env.FUNDABLE_BACKEND_URL! },
   publicKey: connectedAccount,
@@ -39,7 +40,7 @@ cross-network signing errors.
 
 ## Optional capabilities
 
-`router`, `streamNft`, and `sponsorship` are only present on the client when
+`router`, `streamNft`, `distributor`, and `sponsorship` are only present on the client when
 their corresponding contract ID or backend URL is configured:
 
 ```ts

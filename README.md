@@ -42,12 +42,17 @@ const fundable = createFundableClient({
   network: "testnet",
   rpcUrl: "https://soroban-testnet.stellar.org",
   networkPassphrase: "Test SDF Network ; September 2015",
-  contracts: { flow: "C...", router: "C...", streamNft: "C..." },
+  contracts: {
+    flow: "C...",
+    router: "C...",
+    streamNft: "C...",
+    distributor: "C...",
+  },
   sponsorship: { backendUrl: "https://api.fundable.finance" },
 });
 ```
 
-The top-level client exposes Flow, Router, Stream NFT, and sponsorship capability
+The top-level client exposes Flow, Router, Stream NFT, Distributor, and sponsorship capability
 groups when their contract IDs are configured:
 
 ```ts
@@ -66,6 +71,40 @@ const lockup = await fundable.router?.createLockup({
   startTime: new Date(),
   endTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1_000),
   cancelable: true,
+});
+```
+
+Create token distributions and claim tokens using Merkle proofs:
+
+```ts
+import { generateDistributionMerkleTree } from "@fundable/sdk/stellar";
+
+const claims = [
+  { claimant: "G...", amount: 1_000_000n },
+  { claimant: "G...", amount: 2_000_000n },
+];
+
+const { merkleRoot, totalAmount, leafCount, tree } =
+  generateDistributionMerkleTree(claims);
+
+// Create distribution on-chain
+const tx = await fundable.distributor?.createDistribution({
+  creator: "G...",
+  token: "C...",
+  merkleRoot,
+  totalAmount,
+  leafCount,
+  title: "Airdrop 2026",
+  ipfsHash: "Qm...",
+});
+
+// Claimant claims tokens with proof
+const proof = tree.getProof("G...", 1_000_000n);
+const claimTx = await fundable.distributor?.claim({
+  claimant: "G...",
+  distributionId: 1n,
+  amount: 1_000_000n,
+  merkleProof: proof,
 });
 ```
 
@@ -89,6 +128,7 @@ console.log(sent.result);
 
 Fundable's NFT-backed creation workflow goes through `fundable.router`. The
 `fundable.streamNft` group exposes NFT ownership and transfer policy.
+`fundable.distributor` handles Merkle-based token distributions and claims.
 `fundable.sponsorship` implements the production backend-mediated fee flow.
 The legacy `fundable.paymaster` group is deprecated and retained only for
 migration compatibility.
